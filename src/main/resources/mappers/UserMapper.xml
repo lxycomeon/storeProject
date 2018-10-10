@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.mmall.dao.UserMapper" >
   <resultMap id="BaseResultMap" type="com.mmall.pojo.User" >
-    <constructor >
+    <constructor>
       <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
       <arg column="username" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="password" jdbcType="VARCHAR" javaType="java.lang.String" />
@@ -151,4 +151,26 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="checkUsername" resultType="int" parameterType="string">
+    select count(1) from mmall_user
+    where username = #{username}
+  </select>
+  <select id="checkEmail" resultType="int" parameterType="string">
+    select count(1) from mmall_user
+    where email = #{str}
+  </select>
+  <!--mybatis传入多个参数时 参数接收类型为resultMap， 结果集类型为上面定义的id值，也即User-->
+  <select id="selectLogin" resultMap="BaseResultMap" parameterType="map">
+-- 不要用select *，这个习惯不好。,需要什么就取什么，因为公司中的表不一定就一个人用
+      select
+      <include refid="Base_Column_List" />
+      from mmall_user
+      where username = #{username}
+      and   password = #{password}
+  </select>
+    <select id="findMaxId" resultType="Integer">
+        select max(id)
+        from mmall_user
+    </select>
+
 </mapper>
