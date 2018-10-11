@@ -18,7 +18,7 @@ import java.util.UUID;
  * Time: 16:06
  */
 @Service("iUserService")
-public class UserServiceImpl implements IUserService {
+public class UserServiceImpl<校验成功> implements IUserService {
 
 	@Autowired
 	private UserMapper userMapper;
@@ -66,6 +66,69 @@ public class UserServiceImpl implements IUserService {
 			return ServerResponse.createByErrorMessage("用户名已经存在,请重新输入");
 		}
 		return ServerResponse.createBySuccessMessage("校验成功");
+	}
+
+	@Override
+	public ServerResponse<String> getForgetQuestionByUsername(String username) {
+		int resultCount = userMapper.checkUsername(username);
+		if (resultCount == 0){
+			return ServerResponse.createByErrorMessage("用户名不存在，请重新输入");
+		}
+		String forgetQuestion = userMapper.getForgetQuestionByUsername(username);
+		if(forgetQuestion == null || forgetQuestion.trim() == "") {
+			return ServerResponse.createByErrorMessage("该用户未设置找回密码");
+		}
+
+		return ServerResponse.createBySuccess(forgetQuestion);
+	}
+
+	@Override
+	public ServerResponse<String> checkAnswerByQuestion(String username, String question, String answer) {
+		Integer isTrue = userMapper.checkAnswerByQuestion(username, question, answer);
+		if(isTrue == 0){
+			return ServerResponse.createByErrorMessage("问题答案错误,请从新输入");
+		}
+		String token = UUID.randomUUID().toString();//TokenProccessor.getInstance().makeToken();
+		return ServerResponse.createBySuccess(token);
+	}
+
+	@Override
+	public ServerResponse<Integer> ResetPasswordByUsername(String username, String passwordNew) {
+		User user = new User();
+		Integer userId = userMapper.selectIdByUsername(username);
+		user.setId(userId);
+		user.setUsername(username);
+		user.setPassword(passwordNew);
+		Integer isSuccess = userMapper.updateByPrimaryKeySelective(user);
+		if (isSuccess == 0){
+			return ServerResponse.createByErrorMessage("修改密码操作失败，请联系管理员");
+		}
+		return ServerResponse.createBySuccessMessage("修改密码成功");
+	}
+
+	@Override
+	public ServerResponse<Integer> resetPassword(User currentUser, String passwordOld, String passwordNew) {
+		String oldPassword = userMapper.getPasswordById(currentUser.getId());
+		if (oldPassword.equals(passwordOld)){
+			currentUser.setPassword(passwordNew);
+			Integer isSuccess = userMapper.updateByPrimaryKeySelective(currentUser);
+			if (isSuccess == 0){
+				return ServerResponse.createByErrorMessage("修改密码操作失败，请联系管理员");
+			}
+		}else {
+			return ServerResponse.createByErrorMessage("旧密码输入错误，请检查核对");
+		}
+		return ServerResponse.createBySuccessMessage("修改密码成功");
+	}
+
+	@Override
+	public ServerResponse<Integer> updateInformationById(Integer id, User user) {
+		user.setId(id);
+		Integer isSuccess = userMapper.updateByPrimaryKeySelective(user);
+		if(isSuccess == 0){
+			return ServerResponse.createByErrorMessage("更新失败，请联系管理员");
+		}
+		return ServerResponse.createBySuccessMessage("更新信息成功");
 	}
 
 

@@ -172,5 +172,25 @@
         select max(id)
         from mmall_user
     </select>
+  <select id="getForgetQuestionByUsername" resultType="java.lang.String">
+    select question
+    from mmall_user
+    where username = #{username}
+  </select>
+  <select id="checkAnswerByQuestion" resultType="java.lang.Integer">
+     select count(1) from mmall_user
+     where username = #{username}
+     and question   = #{question}
+     and answer     = #{answer}
+  </select>
+    <select id="selectIdByUsername" resultType="java.lang.Integer">
+        select id from mmall_user
+        where username= #{username}
+    </select>
+    <select id="getPasswordById" resultType="string" parameterType="integer">
+        select password
+        from mmall_user
+        WHERE id = #{id}
+    </select>
 
 </mapper>

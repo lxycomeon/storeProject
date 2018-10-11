@@ -24,4 +24,13 @@ public interface UserMapper {
     Integer findMaxId();
 
     int checkEmail(String str);
+
+    String getForgetQuestionByUsername(String username);
+
+    Integer checkAnswerByQuestion(@Param("username")String username, @Param("question") String question, @Param("answer") String answer);
+
+    Integer selectIdByUsername(String username);
+
+    String getPasswordById(Integer id);
+
 }

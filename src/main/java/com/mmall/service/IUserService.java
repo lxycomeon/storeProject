@@ -17,5 +17,13 @@ public interface IUserService {
 
 	ServerResponse<Integer> checkUsernameValid(String str, Integer type);
 
+	ServerResponse<String> getForgetQuestionByUsername(String username);
 
+	ServerResponse<String> checkAnswerByQuestion(String username, String question, String answer);
+
+	ServerResponse<Integer> ResetPasswordByUsername(String username, String passwordNew);
+
+	ServerResponse<Integer> resetPassword(User currentUser, String passwordOld, String passwordNew);
+
+	ServerResponse<Integer> updateInformationById(Integer id, User user);
 }
