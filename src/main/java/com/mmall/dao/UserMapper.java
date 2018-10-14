@@ -33,4 +33,5 @@ public interface UserMapper {
 
     String getPasswordById(Integer id);
 
+    int checkEmailByUserId(@Param("email")String email, @Param("id")Integer id);
 }

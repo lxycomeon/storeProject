@@ -21,9 +21,11 @@ public interface IUserService {
 
 	ServerResponse<String> checkAnswerByQuestion(String username, String question, String answer);
 
-	ServerResponse<Integer> ResetPasswordByUsername(String username, String passwordNew);
+	ServerResponse<String> ResetPasswordByUsername(String username, String passwordNew);
 
 	ServerResponse<Integer> resetPassword(User currentUser, String passwordOld, String passwordNew);
 
-	ServerResponse<Integer> updateInformationById(Integer id, User user);
+	ServerResponse<User> updateInformationById(Integer id, User user);
+
+	ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken);
 }

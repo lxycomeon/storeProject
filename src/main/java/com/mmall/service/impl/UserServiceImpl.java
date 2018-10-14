@@ -1,9 +1,12 @@
 package com.mmall.service.impl;
 
+import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
+import com.mmall.common.TokenCache;
 import com.mmall.dao.UserMapper;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
+import com.mmall.util.MD5Util;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +32,7 @@ public class UserServiceImpl<校验成功> implements IUserService {
 		if (resultCount == 0){
 			return ServerResponse.createByErrorMessage("用户名不存在");
 		}
-		//todo 密码登陆MD5
-		User user = userMapper.selectLogin(username,password);
+		User user = userMapper.selectLogin(username, MD5Util.MD5EncodeUtf8(password));//password
 		if (user == null){
 			return ServerResponse.createByErrorMessage("密码错误");
 		}
@@ -44,11 +46,16 @@ public class UserServiceImpl<校验成功> implements IUserService {
 	@Override
 	public ServerResponse<Integer> register(User user) {
 		int resultCount = userMapper.checkUsername(user.getUsername());
-		if (resultCount == 1){
+		if (resultCount > 0){
 			return ServerResponse.createByErrorMessage("用户名已经存在,请重新输入");
+		}
+		resultCount = userMapper.checkEmail(user.getEmail());
+		if (resultCount > 0){
+			return ServerResponse.createByErrorMessage("邮箱已经存在,请重新输入");
 		}
 //		Integer maxId = userMapper.findMaxId();
 //		user.setId(maxId+1);
+		user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
 		user.setCreateTime(new Date());
 		user.setUpdateTime(new Date());
 		Integer result = userMapper.insertSelective(user);
@@ -88,17 +95,18 @@ public class UserServiceImpl<校验成功> implements IUserService {
 		if(isTrue == 0){
 			return ServerResponse.createByErrorMessage("问题答案错误,请从新输入");
 		}
-		String token = UUID.randomUUID().toString();//TokenProccessor.getInstance().makeToken();
+		String token = UUID.randomUUID().toString();//
+		TokenCache.setKey(Const.FORGET_TOKEN_PREFIX+username,token);	//将token放到本地缓存
 		return ServerResponse.createBySuccess(token);
 	}
 
 	@Override
-	public ServerResponse<Integer> ResetPasswordByUsername(String username, String passwordNew) {
+	public ServerResponse<String> ResetPasswordByUsername(String username, String passwordNew) {
 		User user = new User();
 		Integer userId = userMapper.selectIdByUsername(username);
 		user.setId(userId);
 		user.setUsername(username);
-		user.setPassword(passwordNew);
+		user.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
 		Integer isSuccess = userMapper.updateByPrimaryKeySelective(user);
 		if (isSuccess == 0){
 			return ServerResponse.createByErrorMessage("修改密码操作失败，请联系管理员");
@@ -107,10 +115,31 @@ public class UserServiceImpl<校验成功> implements IUserService {
 	}
 
 	@Override
+	public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
+		if(StringUtils.isBlank(forgetToken)){
+			return ServerResponse.createByErrorMessage("参数错误，token需要传递");
+		}
+		ServerResponse validResponse = this.checkUsernameValid(username,0);
+		if (validResponse.isSuccess()){
+			return ServerResponse.createByErrorMessage("用户不存在");
+		}
+		String token = TokenCache.getKey(Const.FORGET_TOKEN_PREFIX+username);
+		if (StringUtils.isBlank(token)){
+			return ServerResponse.createByErrorMessage("token无效或者过期");
+		}
+		if (StringUtils.equals(forgetToken,token)){//
+			//TODO md5密码校验
+			return this.ResetPasswordByUsername(username,passwordNew);
+		}else {
+			return ServerResponse.createByErrorMessage("token错误，请重新获取");
+		}
+	}
+
+	@Override
 	public ServerResponse<Integer> resetPassword(User currentUser, String passwordOld, String passwordNew) {
 		String oldPassword = userMapper.getPasswordById(currentUser.getId());
-		if (oldPassword.equals(passwordOld)){
-			currentUser.setPassword(passwordNew);
+		if (oldPassword.equals(MD5Util.MD5EncodeUtf8(passwordOld))){
+			currentUser.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
 			Integer isSuccess = userMapper.updateByPrimaryKeySelective(currentUser);
 			if (isSuccess == 0){
 				return ServerResponse.createByErrorMessage("修改密码操作失败，请联系管理员");
@@ -122,13 +151,24 @@ public class UserServiceImpl<校验成功> implements IUserService {
 	}
 
 	@Override
-	public ServerResponse<Integer> updateInformationById(Integer id, User user) {
-		user.setId(id);
-		Integer isSuccess = userMapper.updateByPrimaryKeySelective(user);
-		if(isSuccess == 0){
-			return ServerResponse.createByErrorMessage("更新失败，请联系管理员");
+	public ServerResponse<User> updateInformationById(Integer id, User user) {
+		//更新个人信息时要校验，第一：username不能被更新，email也要进行一个校验，是否已经存在了，并且要出去当前用户的老email
+		int resultCount = userMapper.checkEmailByUserId(user.getEmail(),id);
+		if (resultCount > 0){
+			return ServerResponse.createByErrorMessage("email已经存在，请更换email后再尝试更新");
 		}
-		return ServerResponse.createBySuccessMessage("更新信息成功");
+		User updateUser = new User();
+		updateUser.setId(id);
+		updateUser.setEmail(user.getEmail());
+		updateUser.setPhone(user.getPhone());
+		updateUser.setQuestion(user.getQuestion());
+		updateUser.setAnswer(user.getAnswer());
+
+		Integer isSuccess = userMapper.updateByPrimaryKeySelective(updateUser);
+		if(isSuccess > 0){
+			return ServerResponse.createBySuccessMessage("更新信息成功");
+		}
+		return ServerResponse.createByErrorMessage("更新失败，请联系管理员");
 	}
 
 

@@ -56,6 +56,7 @@ public class UserController {
 	@RequestMapping(value = "check_valid.do")
 	@ResponseBody
 	public ServerResponse<Integer> checkUsernameValid(String str,Integer type){
+
 		ServerResponse<Integer> response = iUserService.checkUsernameValid(str,type);
 		System.out.println(response);
 		return response;
@@ -87,23 +88,24 @@ public class UserController {
 	@ResponseBody
 	public ServerResponse<String> forgetCheckAnswer(String username, String question, String answer, HttpSession session){
 		ServerResponse<String> response = iUserService.checkAnswerByQuestion(username,question,answer);
-		if( ResponseCode.SUCCESS.getCode() == response.getStatus()){	//验证true
-			session.setAttribute(Const.FORGET_TOKEN, response.getData());
-			session.setMaxInactiveInterval(120);
-		}
+		//以下注释代码为，将token放到session中，此处在service层以及利用TokenCache类中方法放入本地缓存了
+//		if( ResponseCode.SUCCESS.getCode() == response.getStatus()){	//验证true
+//			session.setAttribute(Const.FORGET_TOKEN, response.getData());
+//			session.setMaxInactiveInterval(120);
+//		}
 		System.out.println(response);
 		return response;
 	}
 
 	@RequestMapping(value = "forget_reset_password.do")
 	@ResponseBody
-	public ServerResponse<Integer> forgetResetPassword(String username,String passwordNew,String forgetToken,HttpSession session){
-		String serToken = (String) session.getAttribute(Const.FORGET_TOKEN);
-		session.removeAttribute(Const.FORGET_TOKEN);
-		Enumeration<String> seName = session.getAttributeNames();
-		ServerResponse<Integer> response = null;
-		if (serToken != null && serToken.equals(forgetToken) ) {
-			response = iUserService.ResetPasswordByUsername(username,passwordNew);
+	public ServerResponse<String> forgetResetPassword(String username,String passwordNew,String forgetToken ){
+//		String serToken = (String) session.getAttribute(Const.FORGET_TOKEN);
+//		session.removeAttribute(Const.FORGET_TOKEN);
+		ServerResponse<String> response = null;
+		if (forgetToken != null) {
+			//response = iUserService.ResetPasswordByUsername(username,passwordNew);
+			response = iUserService.forgetResetPassword(username,passwordNew,forgetToken);
 		}else {
 			response = ServerResponse.createByErrorMessage("token已经失效");
 		}
@@ -117,22 +119,30 @@ public class UserController {
 		ServerResponse<Integer> response = null;
 		User currentUser = (User) session.getAttribute(Const.CURRENT_USER);	//session中为了保护用户隐私，是不包含密码的
 		//所以要将这些业务逻辑传回service层重新比对旧密码。
+		if (currentUser ==null){
+			response = ServerResponse.createByErrorMessage("用户未登陆");
+		}
 		response = iUserService.resetPassword(currentUser,passwordOld,passwordNew);
 
 		System.out.println(response);
 		return response;
 	}
 
+	//更新用户个人信息后，要把更新后的个人信息重新传回session，
 	@RequestMapping("update_information.do")
 	@ResponseBody
-	public ServerResponse<Integer> updateInformation(User user,HttpSession session){
-		ServerResponse<Integer> response = null;
+	public ServerResponse<User> updateInformation(User user,HttpSession session){
+		ServerResponse<User> response = null;
 		User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+		user.setUsername(currentUser.getUsername());	//username不能被更新，设置为session里面的username
 		if(currentUser == null){
 			response = ServerResponse.createByErrorMessage("更新失败，用户未登陆");
 		}
 		else{
 			response = iUserService.updateInformationById(currentUser.getId(),user);
+		}
+		if (response.isSuccess()){
+			session.setAttribute(Const.CURRENT_USER,response.getData());
 		}
 		System.out.println(response);
 		return response;
