@@ -21,7 +21,7 @@ import java.util.UUID;
  * Time: 16:06
  */
 @Service("iUserService")
-public class UserServiceImpl<校验成功> implements IUserService {
+public class UserServiceImpl implements IUserService {
 
 	@Autowired
 	private UserMapper userMapper;
@@ -172,4 +172,13 @@ public class UserServiceImpl<校验成功> implements IUserService {
 	}
 
 
+	//backEnd后台代码
+
+	@Override
+	public ServerResponse checkAdminRole(User user) {
+		if (user != null && user.getRole().intValue() == Const.Role.ROLE_ADMIN){
+			return ServerResponse.createBySuccess();
+		}
+		return ServerResponse.createByError();
+	}
 }

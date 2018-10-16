@@ -23,6 +23,7 @@ target/
 *.iws
 
 #tmp file
+/log/
 *.log
 *.cache
 *.diff

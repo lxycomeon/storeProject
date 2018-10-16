@@ -21,6 +21,18 @@
     from mmall_category
     where id = #{id,jdbcType=INTEGER}
   </select>
+    <select id="checkParentId" resultType="java.lang.Integer" parameterType="integer">
+    select count(1)
+    from mmall_category
+    where id = #{parentId}
+    </select>
+  <select id="queryByParentId" resultMap="BaseResultMap" parameterType="integer">
+    select
+    <include refid="Base_Column_List" />
+    from mmall_category
+    where parent_id=#{categoryId}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from mmall_category
     where id = #{id,jdbcType=INTEGER}
@@ -51,12 +63,12 @@
       <if test="sortOrder != null" >
         sort_order,
       </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-      <if test="updateTime != null" >
-        update_time,
-      </if>
+      <!--<if test="createTime != null" >-->
+      <!--</if>-->
+      create_time,
+      <!--<if test="updateTime != null" >-->
+      <!--</if>-->
+      update_time,
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -74,12 +86,8 @@
       <if test="sortOrder != null" >
         #{sortOrder,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null" >
         now(),
-      </if>
-      <if test="updateTime != null" >
         now(),
-      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.mmall.pojo.Category" >
@@ -100,9 +108,7 @@
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
         update_time = now(),
-      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -116,4 +122,5 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
 </mapper>
