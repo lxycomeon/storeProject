@@ -2,10 +2,8 @@ package com.mmall.controller;
 
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Observable;
 
 /**
  * Created with IntelliJ IDEA
@@ -16,6 +14,8 @@ import java.util.Observable;
 @Controller
 @RequestMapping("/test")
 public class test {
+
+
 
 	@RequestMapping(value = "test1.do")
 	public String test1(){

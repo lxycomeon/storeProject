@@ -128,7 +128,7 @@ public class UserServiceImpl implements IUserService {
 			return ServerResponse.createByErrorMessage("token无效或者过期");
 		}
 		if (StringUtils.equals(forgetToken,token)){//
-			//TODO md5密码校验
+
 			return this.ResetPasswordByUsername(username,passwordNew);
 		}else {
 			return ServerResponse.createByErrorMessage("token错误，请重新获取");
