@@ -20,8 +20,20 @@ public class ProductController {
 
 	@RequestMapping("list.do")
 	@ResponseBody
-	public ServerResponse listProduct(Integer categoryId, String keyword, @RequestParam(value = "orderBy",defaultValue = "price_asc") String orderBy,@RequestParam(value = "pageNum",defaultValue = "1") int pageNum, @RequestParam(value = "pageSize",defaultValue = "10") int pageSize){
+	public ServerResponse listProduct(@RequestParam(value ="categoryId",required = false) Integer categoryId,
+									  @RequestParam(value ="keyword",required = false)String keyword,
+									  @RequestParam(value = "orderBy",defaultValue = "price_asc") String orderBy,
+									  @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
+									  @RequestParam(value = "pageSize",defaultValue = "10") int pageSize){
 		ServerResponse response = iProductService.listProduct(categoryId,keyword,orderBy,pageNum,pageSize);
+		System.out.println(response);
+		return response;
+	}
+
+	@RequestMapping("detail.do")
+	@ResponseBody
+	public ServerResponse detailProduct(Integer productId){
+		ServerResponse response = iProductService.getProductDetailById(productId);
 		System.out.println(response);
 		return response;
 	}

@@ -25,4 +25,5 @@ public interface ProductMapper {
     List<Product> selectByKeywordAndCategoryId(@Param(value = "categoryId") Integer categoryId, @Param(value = "keyword") String keyword,
                                                @Param(value = "sortField") String sortField,@Param(value = "sortOrder") String sortOrder);
 
+
 }

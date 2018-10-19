@@ -3,6 +3,7 @@ package com.mmall.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.mmall.common.Const;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
@@ -18,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -94,6 +94,22 @@ public class ProductServiceImpl implements IProductService {
 			return ServerResponse.createByErrorMessage("产品已经下架或删除");
 		}
 	}
+
+	@Override
+	public ServerResponse<ProductDetailVo> getProductDetailById(Integer productId) {
+		if (productId == null){
+			return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+		}
+		Product product = productMapper.selectByPrimaryKey(productId);
+		if (product == null){
+			return ServerResponse.createByErrorMessage("产品已经下架或删除");
+		}
+		if (product.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()){
+			return ServerResponse.createByErrorMessage("产品已经下架或删除");
+		}
+		return ServerResponse.createBySuccess(assembleProductDetailVo(product));
+	}
+
 
 	private ProductDetailVo assembleProductDetailVo(Product product){
 		ProductDetailVo productDetailVo = new ProductDetailVo();
@@ -176,15 +192,25 @@ public class ProductServiceImpl implements IProductService {
 
 	@Override
 	public ServerResponse listProduct(Integer categoryId, String keyword, String orderBy, int pageNum, int pageSize) {
+
+
 		PageHelper.startPage(pageNum,pageSize);
+		//PageHelper.orderBy();   使用它也可以传入排序的方法，一个是price desc，另一个是price asc
 		if(StringUtils.isNotBlank(keyword)){
 			keyword = new StringBuilder().append("%").append(keyword).append("%").toString();
 		}else {
 			keyword = null;
 		}
-		String sortField =orderBy.substring(orderBy.lastIndexOf("_")+1);
-		String sortOrder = orderBy.substring(0,orderBy.lastIndexOf("_"));
-
+		String sortOrder = null;
+		String sortField = null;
+		if (Const.ProductListOrderBy.PRICE_ASC_DESC.contains(orderBy)){
+			//判断排序字段名的有效性和排序的有效性
+			//分割orderBy字段，排序.或者使用pagehelper的排序功能
+			sortOrder =orderBy.substring(orderBy.lastIndexOf("_")+1);
+			sortField = orderBy.substring(0,orderBy.lastIndexOf("_"));
+		}else {
+			return ServerResponse.createByErrorMessage("排序字段名无效，参数错误");
+		}
 		List<Product> productList = productMapper.selectByKeywordAndCategoryId(categoryId,keyword,sortField,sortOrder);
 		List<ProductListVo> productListVoList = Lists.newArrayList();
 		for (Product productItem:productList) {

@@ -48,6 +48,7 @@ public class CategoryManageController {
 		} else {
 			response = ServerResponse.createByErrorMessage("权限不够");
 		}
+
 		System.out.println(response);
 		return response;
 	}

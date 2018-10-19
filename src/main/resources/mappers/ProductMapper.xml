@@ -50,18 +50,19 @@
     select
     <include refid="Base_Column_List"/>
     from mmall_product
-    <where>
-      <if test="keyword != null">
-        and name like #{keyword}
-      </if>
-      <if test="categoryId != null">
-        and category_id = #{categoryId}
-      </if>
-      <if test="orderBy != null">
-        order by ${sortField} ${sortOrder}
-      </if>
-    </where>
-
+    <if test="categoryId != null or keyword != null">
+      <where>
+        <if test="keyword != null">
+          and name like #{keyword}
+        </if>
+        <if test="categoryId != null">
+          and category_id = #{categoryId}
+        </if>
+      </where>
+    </if>
+    <if test="sortField != null">
+      order by ${sortField} ${sortOrder}
+    </if>
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
