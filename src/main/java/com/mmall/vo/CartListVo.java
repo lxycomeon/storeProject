@@ -1,5 +1,8 @@
 package com.mmall.vo;
 
+import com.mmall.common.Const;
+import com.mmall.util.BigDecimalUtil;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -11,6 +14,7 @@ public class CartListVo {
 	private List<CartProductVo> cartProductVoList;
 	private boolean allChecked;
 	private BigDecimal cartTotalPrice;
+	private String imageHost;
 
 	public CartListVo() {
 	}
@@ -40,7 +44,9 @@ public class CartListVo {
 	public BigDecimal getCartTotalPrice() {
 		BigDecimal total = new BigDecimal("0.0");
 		for (CartProductVo cartProductItem:cartProductVoList) {
-			total = total.add(cartProductItem.getProductTotalPrice());
+			if (cartProductItem.getProductChecked() == Const.ProductCheckStatus.SELECT)	//compute checked product total price
+				total = BigDecimalUtil.add(total.doubleValue(),cartProductItem.getProductTotalPrice().doubleValue());
+				//total = total.add(cartProductItem.getProductTotalPrice());
 		}
 
 		return total;
@@ -48,5 +54,13 @@ public class CartListVo {
 
 	public void setCartTotalPrice(BigDecimal cartTotalPrice) {
 		this.cartTotalPrice = cartTotalPrice;
+	}
+
+	public String getImageHost() {
+		return imageHost;
+	}
+
+	public void setImageHost(String imageHost) {
+		this.imageHost = imageHost;
 	}
 }

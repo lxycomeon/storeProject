@@ -22,4 +22,6 @@ public interface CartMapper {
 
     Cart selectByUserIdAndProduct(@Param(value = "productId") Integer productId, @Param(value = "userId") Integer userId);
 
+    int selectProductCountByUserId(Integer userId);
+
 }

@@ -1,5 +1,7 @@
 package com.mmall.vo;
 
+import com.mmall.util.BigDecimalUtil;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -117,8 +119,8 @@ public class CartProductVo {
 		this.productStatus = productStatus;
 	}
 
-	public BigDecimal getProductTotalPrice() {
-		return productPrice.multiply(BigDecimal.valueOf(quantity));
+	public BigDecimal getProductTotalPrice() {	//避免丢失精度
+		return BigDecimalUtil.mul(productPrice.doubleValue(),quantity);//productPrice.multiply(BigDecimal.valueOf(quantity));
 	}
 
 	public void setProductTotalPrice(BigDecimal productTotalPrice) {

@@ -67,6 +67,100 @@ public class CartController {
 		return response;
 	}
 
+	@RequestMapping("delete_product.do")
+	@ResponseBody
+	public ServerResponse deleteProduct(HttpSession session,String productIds){
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		ServerResponse response = null;
+
+		if (user == null){
+			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录");
+		}else {
+			response = iCartService.deleteProductByIds(productIds,user.getId());
+		}
+		System.out.println(response);
+		return response;
+	}
+
+	@RequestMapping("select.do")
+	@ResponseBody
+	public ServerResponse selectProduct(HttpSession session,Integer productId){
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		ServerResponse response = null;
+
+		if (user == null){
+			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录");
+		}else {
+			response = iCartService.updateSelectProduct(productId,user.getId(),Const.ProductCheckStatus.SELECT);
+		}
+		System.out.println(response);
+		return response;
+	}
+
+	@RequestMapping("un_select.do")
+	@ResponseBody
+	public ServerResponse unSelectProduct(HttpSession session,Integer productId){
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		ServerResponse response = null;
+
+		if (user == null){
+			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录");
+		}else {
+			response = iCartService.updateSelectProduct(productId,user.getId(),Const.ProductCheckStatus.UN_SELECT);
+		}
+		System.out.println(response);
+		return response;
+	}
+
+	@RequestMapping("get_cart_product_count.do")
+	@ResponseBody
+	public ServerResponse getCartProductCount(HttpSession session ){
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		ServerResponse response = null;
+
+		if (user == null){
+			response = ServerResponse.createBySuccess(0);
+		}else {
+			response = iCartService.getCartProductCount(user.getId());
+		}
+		System.out.println(response);
+		return response;
+	}
+
+	@RequestMapping("select_all.do")
+	@ResponseBody
+	public ServerResponse selectAllProduct(HttpSession session ){
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		ServerResponse response = null;
+
+		if (user == null){
+			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录");
+		}else {
+			response = iCartService.updateSelectAllProduct(user.getId(),Const.ProductCheckStatus.SELECT);
+		}
+		System.out.println(response);
+		return response;
+	}
+
+	@RequestMapping("un_select_all.do")
+	@ResponseBody
+	public ServerResponse unSelectAllProduct(HttpSession session ){
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		ServerResponse response = null;
+
+		if (user == null){
+			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录");
+		}else {
+			response = iCartService.updateSelectAllProduct(user.getId(),Const.ProductCheckStatus.UN_SELECT);
+		}
+		System.out.println(response);
+		return response;
+	}
+
+
+
+
+
 
 
 

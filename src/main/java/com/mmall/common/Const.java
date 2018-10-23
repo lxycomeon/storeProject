@@ -19,6 +19,7 @@ public class Const {
 		int ROLE_ADMIN = 1;		//管理员
 	}
 
+
 	public interface LimitQuantity{
 		String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
 		String LIMIT_NUM_FAIL  = "LIMIT_NUM_FAIL";
@@ -26,6 +27,11 @@ public class Const {
 
 	public interface ProductListOrderBy{
 		Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_desc","price_asc","stock_desc","stock_asc");
+	}
+
+	public interface ProductCheckStatus{
+		Integer SELECT = 1;
+		Integer UN_SELECT = 0;
 	}
 
 	public enum ProductStatusEnum{

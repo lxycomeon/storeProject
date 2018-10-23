@@ -34,6 +34,12 @@
     where user_id = #{userId}
     and product_id = #{productId}
   </select>
+  <!--这个sql语句，对结果给个别名count，可以去掉，对查询出来的quantity进行相加，如果查询不到，ifnull赋值为默认值为0-->
+  <select id="selectProductCountByUserId" resultType="java.lang.Integer" parameterType="Integer">
+    select IFNULL(sum(quantity),0) as count
+    from mmall_cart
+    where user_id = #{userId}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from mmall_cart
     where id = #{id,jdbcType=INTEGER}

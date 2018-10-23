@@ -36,14 +36,16 @@ public class ProductServiceImpl implements IProductService {
 	public ServerResponse saveOrUpdateProduct(Product product) {
 
 		if (product != null){
-			if (StringUtils.isBlank(product.getMainImage())){
-				String[] subImageArray = product.getSubImages().split(",");
-				if (subImageArray.length >0){
-					product.setMainImage(subImageArray[0]);
+			if (!StringUtils.isBlank(product.getMainImage())){
+				if (StringUtils.isBlank(product.getMainImage())){
+					String[] subImageArray = product.getSubImages().split(",");
+					if (subImageArray.length >0){
+						product.setMainImage(subImageArray[0]);
+					}
 				}
 			}
 			if (product.getId() != null){
-				int rowCount = productMapper.updateByPrimaryKey(product);
+				int rowCount = productMapper.updateByPrimaryKeySelective(product);
 				if (rowCount > 0){
 					return ServerResponse.createBySuccessMessage("更新产品成功");
 				}else {
