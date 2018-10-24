@@ -90,6 +90,7 @@
         <property name="dataSource" ref="dataSource"/>
         <!--提交失败时是否回滚-->
         <property name="rollbackOnCommitFailure" value="true"/>
+
     </bean>
 
 
