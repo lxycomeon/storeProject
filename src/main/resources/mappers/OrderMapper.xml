@@ -29,6 +29,19 @@
     from mmall_order
     where id = #{id,jdbcType=INTEGER}
   </select>
+    <select id="selectByOrderNo" resultMap="BaseResultMap" parameterType="Long">
+      select
+      <include refid="Base_Column_List"/>
+      from mmall_order
+      where order_no = #{orderNo}
+    </select>
+  <select id="selectByOrderNoAndUserId" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List"/>
+    from mmall_order
+    where order_no = #{orderNo}
+    and user_id = #{userId}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from mmall_order
     where id = #{id,jdbcType=INTEGER}
@@ -84,12 +97,8 @@
       <if test="closeTime != null" >
         close_time,
       </if>
-      <if test="createTime != null" >
         create_time,
-      </if>
-      <if test="updateTime != null" >
         update_time,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -128,12 +137,8 @@
       <if test="closeTime != null" >
         #{closeTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="createTime != null" >
         now(),
-      </if>
-      <if test="updateTime != null" >
         now(),
-      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.mmall.pojo.Order" >
@@ -172,12 +177,7 @@
       <if test="closeTime != null" >
         close_time = #{closeTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null" >
         update_time = now(),
-      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -194,7 +194,6 @@
       send_time = #{sendTime,jdbcType=TIMESTAMP},
       end_time = #{endTime,jdbcType=TIMESTAMP},
       close_time = #{closeTime,jdbcType=TIMESTAMP},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>

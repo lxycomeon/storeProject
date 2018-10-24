@@ -17,6 +17,6 @@ public interface IShippingService {
 
 	ServerResponse<Shipping> selectByIdAndUserId(Integer shippingId, Integer id);
 
-
 	ServerResponse<PageInfo> listByUserId(int pageNum, int pageSize, Integer userId);
+
 }

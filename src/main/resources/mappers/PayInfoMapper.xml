@@ -56,12 +56,9 @@
       <if test="platformStatus != null" >
         platform_status,
       </if>
-      <if test="createTime != null" >
         create_time,
-      </if>
-      <if test="updateTime != null" >
         update_time,
-      </if>
+
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -82,12 +79,8 @@
       <if test="platformStatus != null" >
         #{platformStatus,jdbcType=VARCHAR},
       </if>
-      <if test="createTime != null" >
         now(),
-      </if>
-      <if test="updateTime != null" >
         now(),
-      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.mmall.pojo.PayInfo" >
@@ -108,12 +101,7 @@
       <if test="platformStatus != null" >
         platform_status = #{platformStatus,jdbcType=VARCHAR},
       </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null" >
-        update_time = now(),
-      </if>
+        update_time = now()
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -124,7 +112,6 @@
       pay_platform = #{payPlatform,jdbcType=INTEGER},
       platform_number = #{platformNumber,jdbcType=VARCHAR},
       platform_status = #{platformStatus,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>

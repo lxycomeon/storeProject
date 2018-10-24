@@ -231,6 +231,7 @@
           </configuration>
         </plugin>
 
+        <!--这个插件使其，lib文件夹下的一些jar包在项目工程打包的时候，会直接打包包括项目需要的依赖的其他maven库中的jar包，然后发布到服务器上-->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
