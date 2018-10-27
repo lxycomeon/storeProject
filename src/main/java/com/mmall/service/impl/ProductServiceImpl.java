@@ -205,6 +205,8 @@ public class ProductServiceImpl implements IProductService {
 		}
 		String sortOrder = null;
 		String sortField = null;
+		if (orderBy.equals("default"))
+			orderBy = "price_desc";
 		if (Const.ProductListOrderBy.PRICE_ASC_DESC.contains(orderBy)){
 			//判断排序字段名的有效性和排序的有效性
 			//分割orderBy字段，排序.或者使用pagehelper的排序功能

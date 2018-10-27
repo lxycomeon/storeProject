@@ -162,9 +162,6 @@
       <if test="receiverZip != null" >
         receiver_zip = #{receiverZip,jdbcType=VARCHAR},
       </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
         update_time = now(),
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -180,7 +177,6 @@
       receiver_district = #{receiverDistrict,jdbcType=VARCHAR},
       receiver_address = #{receiverAddress,jdbcType=VARCHAR},
       receiver_zip = #{receiverZip,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -195,7 +191,6 @@
       receiver_district = #{receiverDistrict,jdbcType=VARCHAR},
       receiver_address = #{receiverAddress,jdbcType=VARCHAR},
       receiver_zip = #{receiverZip,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
     and user_id = #{userId,jdbcType=INTEGER}

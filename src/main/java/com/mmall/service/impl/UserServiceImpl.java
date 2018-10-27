@@ -58,6 +58,10 @@ public class UserServiceImpl implements IUserService {
 		user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
 		user.setCreateTime(new Date());
 		user.setUpdateTime(new Date());
+		if (user.getRole() == null){
+			user.setRole(0);
+		}
+
 		Integer result = userMapper.insertSelective(user);
 		return ServerResponse.createBySuccess("注册成功，欢迎使用mmall商城",result);
 	}
