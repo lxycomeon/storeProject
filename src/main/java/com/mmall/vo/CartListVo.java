@@ -2,6 +2,7 @@ package com.mmall.vo;
 
 import com.mmall.common.Const;
 import com.mmall.util.BigDecimalUtil;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;

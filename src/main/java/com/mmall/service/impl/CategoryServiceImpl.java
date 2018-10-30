@@ -6,6 +6,7 @@ import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
 import com.mmall.pojo.Category;
 import com.mmall.service.ICategoryService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,11 +24,12 @@ import java.util.Set;
  * Time: 22:35
  */
 @Service("iCategoryService")
+@Slf4j		//使用lombok插件，直接注解引入了该log日志框架，下面使用log变量就不会报错
 public class CategoryServiceImpl implements ICategoryService {
 	@Autowired
 	private CategoryMapper categoryMapper;
 
-	private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
+	//private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
 	@Override
 	public ServerResponse addCategory(String categoryName, Integer parentId) {
@@ -60,7 +62,7 @@ public class CategoryServiceImpl implements ICategoryService {
 	public ServerResponse getCategoryByParentId(int categoryId) {
 		List<Category> list = categoryMapper.queryByParentId(categoryId);
 		if (CollectionUtils.isEmpty(list)){
-			logger.info("未找到当前分类的子分类信息！");
+			log.info("未找到当前分类的子分类信息！");
 			//未找到分类也能给前端报错，这里用日志解决
 //			return ServerResponse.createByErrorMessage("未找到该品类");
 		}
