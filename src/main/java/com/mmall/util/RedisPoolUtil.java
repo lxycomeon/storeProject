@@ -26,6 +26,40 @@ public class RedisPoolUtil {
 		return result;
 	}
 
+	//setnx，只有set的时候，不存在这个key的话，才会set成功。
+	public static Long setnx(String key,String value){
+		Jedis jedis = null;
+		Long result = null;
+
+		try {
+			jedis = RedisPool.getJedis();
+			result = jedis.setnx(key,value);
+		}catch (Exception e){
+			log.error("setnx key{} value:{} error",key,value,e);
+			RedisPool.returnBrokenResource(jedis);
+			return result;
+		}
+		RedisPool.returnResource(jedis);
+		return result;
+	}
+
+	//getset,set新值的同时获取旧值
+	public static String getSet(String key,String value){
+		Jedis jedis = null;
+		String result = null;
+
+		try {
+			jedis = RedisPool.getJedis();
+			result = jedis.getSet(key,value);
+		}catch (Exception e){
+			log.error("getset key{} value:{} error",key,value,e);
+			RedisPool.returnBrokenResource(jedis);
+			return result;
+		}
+		RedisPool.returnResource(jedis);
+		return result;
+	}
+
 	//ex单位为s
 	public static String setEx(String key,String value,int exTime){
 		Jedis jedis = null;

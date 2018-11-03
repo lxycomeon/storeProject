@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!--配置日志的路径，tomcat/logs下-->
+    <property name="LOG_HOME" value="${CATALINA_HOME}/logs"></property>
+
     <!--日志logback的配置-->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoding>UTF-8</encoding>
@@ -14,6 +17,8 @@
     <appender name="mmall" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--<File>d:/mmalllog/mmall.log</File>-->
         <!--<File>/developer/apache-tomcat-7.0.73/logs/mmall.log</File>-->
+        <!--引用上面的LOG_HOME，设置新的日志的路径，包括下面的所有的日志的文件路径都要修改-->
+        <!--<File>${LOG_HOME}/mmall.log</File>-->
         <File>E:\IdeaProjects\mmall\logs/mmall.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>E:\IdeaProjects\mmall\logs/mmall.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
@@ -48,6 +53,7 @@
     <logger name="com.mmall" additivity="false" level="INFO" >
         <appender-ref ref="mmall" />
         <appender-ref ref="console"/>
+        <appender-ref ref="error"/>
     </logger>
 
 
