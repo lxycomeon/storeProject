@@ -15,7 +15,8 @@ public class Const {
 	public static final String FORGET_TOKEN_PREFIX = "forgetToken_";
 
 	public interface RedisCacheExtime{
-		int REDIS_SESSION_EXTIME = 60 * 30;//30分钟有效期
+		int REDIS_SESSION_EXTIME = 60 * 60 * 24*7;//登陆信息7 天有效
+		int REDIS_FORGET_TOKEN_EXTIME = 60 * 60;//忘记密码token，1h有效
 	}
 
 

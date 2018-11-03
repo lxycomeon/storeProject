@@ -45,4 +45,7 @@ public interface IOrderService {
 	ServerResponse manageSendGoods(Long orderNo);
 
 
+	//定时关闭订单,传入前多长时间未付款的订单进行关闭
+	void closeOrder(int hour);
+
 }

@@ -55,11 +55,19 @@
     from mmall_order
     order by create_time desc
   </select>
+  <select id="selectByStatusAndTime" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM mmall_order
+    WHERE status = #{code}
+    and create_time &lt; #{closeDateTime}
+    order by create_time desc
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from mmall_order
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.mmall.pojo.Order" >
+    <insert id="insert" parameterType="com.mmall.pojo.Order" >
     insert into mmall_order (id, order_no, user_id, 
       shipping_id, payment, payment_type, 
       postage, status, payment_time, 

@@ -26,4 +26,6 @@ public interface ProductMapper {
                                                @Param(value = "sortField") String sortField,@Param(value = "sortOrder") String sortOrder);
 
 
+    //定时关单使用
+    Integer selectStockByPrimaryKey(Integer productId);
 }

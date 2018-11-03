@@ -50,6 +50,8 @@ public class CategoryServiceImpl implements ICategoryService {
 
 	@Override
 	public ServerResponse<Integer> checkParentId(int parentId) {
+		if(parentId == 0)
+			return ServerResponse.createBySuccess();
 		Integer resultCount = categoryMapper.checkParentId(parentId);
 		if (resultCount > 0){
 			return ServerResponse.createBySuccess();

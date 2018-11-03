@@ -12,8 +12,10 @@
     http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <!--springMVC的配置文件-->
-    <!--包扫描，扫描controller注解-->
-    <context:component-scan base-package="com.mmall" annotation-config="true"/>
+    <!--包扫描,将controller注解交给springMVC配置文件进行扫描,把默认扫描关闭-->
+    <context:component-scan base-package="com.mmall.controller" annotation-config="true" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
 
     <mvc:annotation-driven>
         <mvc:message-converters>
@@ -44,6 +46,18 @@
         <property name="maxInMemorySize" value="4096" />
         <property name="defaultEncoding" value="UTF-8"></property>
     </bean>
+
+    <mvc:interceptors>
+        <!--定义在这个标签中的，所有的do请求都会被拦截-->
+        <mvc:interceptor>
+            <!--这里的path路径，如果输入manage/**表示拦截manage/product,manage/order,路径下的所有的*.do。
+            如果输入 manage/*表示拦截 manage/*.do manage下的而不是manage的子文件夹下的*.do-->
+            <mvc:mapping path="/manage/**"/>
+            <!--要排除login。do的mapping，不然会进入一个死循环，或者在拦截器中逻辑进行login。do的放过或者不放过-->
+            <!--<mvc:exclude-mapping path="/manage/user/login.do"/>-->
+            <bean class="com.mmall.controller.common.interceptor.AuthorityInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors>
 
 
 </beans>

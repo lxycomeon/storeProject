@@ -31,6 +31,7 @@ import com.mmall.vo.OrderListVo;
 import com.mmall.vo.OrderProductVo;
 import com.mmall.vo.ShippingVo;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -496,5 +497,31 @@ public class OrderServiceImpl implements IOrderService {
 			return ServerResponse.createBySuccess("发货成功");
 		}
 		return ServerResponse.createBySuccess("发货失败");
+	}
+
+	@Override
+	public void closeOrder(int hour) {
+		Date closeDateTime = DateUtils.addHours(new Date(),-hour);
+		List<Order> orderList = orderMapper.selectByStatusAndTime(Const.OrderStatusEnum.NO_PAY.getCode(),closeDateTime);
+		for (Order order:orderList) {
+			List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());
+			for (OrderItem orderItemItem:orderItemList) {
+				//Product product = productMapper.selectByPrimaryKey(orderItemItem.getProductId());
+				Integer stock = productMapper.selectStockByPrimaryKey(orderItemItem.getProductId());//这里只查库存(节省sql效率)，且在sql语句的后面加上for update作为乐观锁
+				if (stock == null){	//查询的商品已经被删除了
+					continue;
+				}
+				Product product = new Product();
+				product.setId(orderItemItem.getProductId());
+				product.setStock(stock + orderItemItem.getQuantity());//更新库存
+				productMapper.updateByPrimaryKeySelective(product);
+			}
+			order.setCloseTime(new Date());
+			order.setStatus(Const.OrderStatusEnum.CANCELED.getCode());
+			orderMapper.updateByPrimaryKeySelective(order);	//这种更新方法，会使得更新的语句和字段很长，不利于执行效率。
+			log.info("取消订单：{}",order.getOrderNo());
+		}
+
+
 	}
 }

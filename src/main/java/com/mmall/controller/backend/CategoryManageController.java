@@ -1,18 +1,21 @@
 package com.mmall.controller.backend;
 
-import com.mmall.common.Const;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.ICategoryService;
 import com.mmall.service.IUserService;
+import com.mmall.util.CookieUtil;
+import com.mmall.util.JsonUtil;
+import com.mmall.util.RedisPoolUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -32,75 +35,43 @@ public class CategoryManageController {
 
 	@RequestMapping("add_category.do")
 	@ResponseBody
-	public ServerResponse addCategory(HttpSession session,String categoryName,@RequestParam(value = "parentId",defaultValue = "0") Integer parentId){
+	public ServerResponse addCategory( String categoryName, @RequestParam(value = "parentId",defaultValue = "0") Integer parentId){
 		ServerResponse response = null;
-		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		if (user == null){
-			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登陆");
+		//用户权限验证部分在拦截器中实现，只需要关注业务代码
+		if (iCategoryService.checkParentId(parentId).isSuccess()){
+			response = iCategoryService.addCategory(categoryName,parentId);
 		}
-		if(iUserService.checkAdminRole(user).isSuccess()){
-			if (iCategoryService.checkParentId(parentId).isSuccess()){
-				response = iCategoryService.addCategory(categoryName,parentId);
-			}
-			else{
-				response = ServerResponse.createByErrorMessage("没有该父类目录，请重新输入");
-			}
-		} else {
-			response = ServerResponse.createByErrorMessage("权限不够");
+		else{
+			response = ServerResponse.createByErrorMessage("没有该父类目录，请重新输入");
 		}
-
 		System.out.println(response);
 		return response;
 	}
 
 	@RequestMapping("get_category.do")
 	@ResponseBody
-	public ServerResponse getCategory(HttpSession session,@RequestParam(value = "categoryId",defaultValue = "0")int categoryId){
+	public ServerResponse getCategory( @RequestParam(value = "categoryId",defaultValue = "0")int categoryId){
 		ServerResponse response = null;
-		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		if (user == null){
-			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登陆");
-		}
-		if(iUserService.checkAdminRole(user).isSuccess()){
-			response = iCategoryService.getCategoryByParentId(categoryId);
-		} else {
-			response = ServerResponse.createByErrorMessage("权限不够");
-		}
+		response = iCategoryService.getCategoryByParentId(categoryId);
+
 		System.out.println(response);
 		return response;
 	}
 
 	@RequestMapping("set_category_name.do")
 	@ResponseBody
-	public ServerResponse setCategoryName(HttpSession session,int categoryId,String categoryName){
+	public ServerResponse setCategoryName(int categoryId,String categoryName){
 		ServerResponse response = null;
-		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		if (user == null){
-			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登陆");
-		}
-		if(iUserService.checkAdminRole(user).isSuccess()){
-			response = iCategoryService.setCategoryName(categoryId,categoryName);
-
-		} else {
-			response = ServerResponse.createByErrorMessage("权限不够");
-		}
+		response = iCategoryService.setCategoryName(categoryId,categoryName);
 		System.out.println(response);
 		return response;
 	}
 
 	@RequestMapping("get_deep_category.do")
 	@ResponseBody
-	public ServerResponse<List<Integer>> getDeepCategory(HttpSession session,int categoryId){
+	public ServerResponse<List<Integer>> getDeepCategory(int categoryId){
 		ServerResponse response = null;
-		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		if (user == null){
-			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登陆");
-		}
-		if(iUserService.checkAdminRole(user).isSuccess()){
-			response = iCategoryService.selectCategoryAndChildrenById(categoryId);
-		} else {
-			response = ServerResponse.createByErrorMessage("权限不够");
-		}
+		response = iCategoryService.selectCategoryAndChildrenById(categoryId);
 		System.out.println(response);
 		return response;
 	}

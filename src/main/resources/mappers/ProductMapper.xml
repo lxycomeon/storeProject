@@ -64,6 +64,12 @@
       order by ${sortField} ${sortOrder}
     </if>
   </select>
+  <select id="selectStockByPrimaryKey" resultType="java.lang.Integer" parameterType="int">
+    select stock
+    from mmall_product
+    where id = #{productId}
+    for update
+  </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from mmall_product

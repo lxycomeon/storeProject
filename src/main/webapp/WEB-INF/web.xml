@@ -24,6 +24,27 @@
   </filter-mapping>
 
 
+  <!--原生的redis中session过滤器重置session的生存时间-->
+  <filter>
+    <filter-name>SessionExpireFilter</filter-name>
+    <filter-class>com.mmall.controller.common.SessionExpireFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>SessionExpireFilter</filter-name>
+    <url-pattern>*.do</url-pattern>
+  </filter-mapping>
+
+  <!--springSession框架使用的重置session生存时间的内置过滤器,此时要在代码中继续使用session也即是未改变之前springSession的原生框架，不会对业务代码具有侵入性-->
+  <!--<filter>-->
+    <!--<filter-name>springSessionRepositoryFilter</filter-name>-->
+    <!--<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>-->
+  <!--</filter>-->
+  <!--<filter-mapping>-->
+    <!--<filter-name>springSessionRepositoryFilter</filter-name>-->
+    <!--<url-pattern>*.do</url-pattern>-->
+  <!--</filter-mapping>-->
+
+
   <listener>
     <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
   </listener>
@@ -51,10 +72,19 @@
   </servlet>
 
   <!--*.do的路径都会被springMvc拦截，1代表优先级启动顺序-->
+  <!--<servlet-mapping>-->
+    <!--<servlet-name>dispatcher</servlet-name>-->
+    <!--<url-pattern>*.do</url-pattern>-->
+  <!--</servlet-mapping>-->
+
+  <!--这里进行了RESTful改造。改为/拦截所有的资源请求，如果用了*.do则在路径中不写.do也可以映射到对应的RequestMapping-->
   <servlet-mapping>
     <servlet-name>dispatcher</servlet-name>
-    <url-pattern>*.do</url-pattern>
+    <url-pattern>/</url-pattern>
   </servlet-mapping>
+
+
+
 
 </web-app>
 
