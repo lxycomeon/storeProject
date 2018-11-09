@@ -75,6 +75,9 @@ public class OrderServiceImpl implements IOrderService {
 	@Autowired
 	UserMapper userMapper;
 
+	@Autowired
+	MiaoshaProductMapper miaoshaProductMapper;
+
 
 	// 支付宝当面付2.0服务
 	private static AlipayTradeService   tradeService;
@@ -521,7 +524,55 @@ public class OrderServiceImpl implements IOrderService {
 			orderMapper.updateByPrimaryKeySelective(order);	//这种更新方法，会使得更新的语句和字段很长，不利于执行效率。
 			log.info("取消订单：{}",order.getOrderNo());
 		}
+	}
+
+	//秒杀订单的创建，商品数量只能为1
+	@Override
+	public ServerResponse createMiaoshaOrder(Integer userId, Integer shippingId, Integer miaoshaProductId) {
+		Shipping shipping = shippingMapper.selectByPrimaryKey(shippingId);	//dress
+		if (shipping == null || shipping.getUserId() != userId){
+			return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+		}
+		int rowCount;
+		Order order = new Order();
+		Long orderNum = generateOrderNo();
+
+		MiaoshaProduct miaoshaProduct = miaoshaProductMapper.selectByPrimaryKey(miaoshaProductId);
+		//后台再加一个秒杀时间控制
+		if (miaoshaProduct.getStartTime().getTime() > System.currentTimeMillis() || miaoshaProduct.getEndTime().getTime() < System.currentTimeMillis()){
+			return ServerResponse.createByErrorMessage("秒杀时间有误，请稍后再试");
+		}
+
+		OrderItem orderItem = new OrderItem();
+
+		Product productItem = productMapper.selectByPrimaryKey(miaoshaProduct.getProductId());
+		if (miaoshaProduct.getMiaoshaStock() < 1){
+			return ServerResponse.createByErrorMessage("产品"+productItem.getName()+"库存不足,秒杀失败,已结被抢完啦");
+		}
+		orderItem.setUserId(userId);
+		orderItem.setOrderNo(orderNum);
+		orderItem.setProductId(miaoshaProduct.getProductId());
+		orderItem.setProductName(productItem.getName());
+		orderItem.setProductImage(productItem.getMainImage());
+		//这里注意是秒杀价格
+		orderItem.setCurrentUnitPrice(miaoshaProduct.getMiaoshaPrice());
+		orderItem.setQuantity(1);
+		orderItem.setTotalPrice(miaoshaProduct.getMiaoshaPrice());
 
 
+		rowCount = orderItemMapper.insertSelective(orderItem);	//插入订单项
+		miaoshaProduct.setMiaoshaStock(miaoshaProduct.getMiaoshaStock() - 1);
+		//减少秒杀产品库存,新new一个对象出来，只有两个要更新的值，增加sql语句的执行效率
+		rowCount = miaoshaProductMapper.updateByPrimaryKeySelective(new MiaoshaProduct(miaoshaProduct.getId(),miaoshaProduct.getMiaoshaStock()));
+
+		order.setOrderNo(orderNum);
+		order.setUserId(userId);
+		order.setShippingId(shippingId);
+		order.setPayment(orderItem.getTotalPrice());
+		order.setPaymentType(Const.PaymentTypeEnum.ONLINE_PAY.getCode());
+		order.setPostage(0);	//邮费0
+		order.setStatus(Const.OrderStatusEnum.NO_PAY.getCode());
+		rowCount = orderMapper.insertSelective(order);
+		return ServerResponse.createBySuccess(assembleOrderListVoByOrder(order));
 	}
 }

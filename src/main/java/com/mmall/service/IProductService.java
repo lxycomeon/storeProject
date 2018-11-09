@@ -2,6 +2,7 @@ package com.mmall.service;
 
 import com.github.pagehelper.PageInfo;
 import com.mmall.common.ServerResponse;
+import com.mmall.pojo.MiaoshaProduct;
 import com.mmall.pojo.Product;
 import com.mmall.vo.ProductDetailVo;
 
@@ -23,5 +24,12 @@ public interface IProductService {
 	ServerResponse<PageInfo> searchProduct(int pageNum, int pageSize, String productName, String productId);
 
 	ServerResponse listProduct(Integer categoryId, String keyword, String orderBy, int pageNum, int pageSize);
+
+	ServerResponse saveOrUpdateMiaoshaProduct(MiaoshaProduct miaoshaProduct);
+
+	ServerResponse listMiaoshaProduct();
+
+	ServerResponse getMiaoshaProductDetailById(Integer miaoshaProductId);
+
 
 }

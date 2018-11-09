@@ -36,9 +36,20 @@
                 </property>
             </bean>
         </mvc:message-converters>
+
     </mvc:annotation-driven>
 
+    <mvc:annotation-driven conversion-service="converService"/>
 
+    <!-- 日期时间数据绑定 需要放在mvc:annotation-driven 之前 防止未扫描注入容器总- -->
+    <bean id="converService"
+          class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <list>
+                <bean class="com.mmall.controller.common.MyConverter" />
+            </list>
+        </property>
+    </bean>
 
     <!-- springMVC文件上传 -->
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">

@@ -7,18 +7,20 @@ import com.mmall.common.Const;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
+import com.mmall.dao.MiaoshaProductMapper;
 import com.mmall.dao.ProductMapper;
 import com.mmall.pojo.Category;
+import com.mmall.pojo.MiaoshaProduct;
 import com.mmall.pojo.Product;
 import com.mmall.service.IProductService;
 import com.mmall.util.DateTimeUtil;
 import com.mmall.util.PropertiesUtil;
-import com.mmall.vo.ProductDetailVo;
-import com.mmall.vo.ProductListVo;
+import com.mmall.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -31,6 +33,8 @@ public class ProductServiceImpl implements IProductService {
 	private ProductMapper productMapper;
 	@Autowired
 	private CategoryMapper categoryMapper;
+	@Autowired
+	private MiaoshaProductMapper miaoshaProductMapper;
 
 	@Override
 	public ServerResponse saveOrUpdateProduct(Product product) {
@@ -224,4 +228,124 @@ public class ProductServiceImpl implements IProductService {
 
 		return ServerResponse.createBySuccess(pageResult);
 	}
+
+	//////////////////秒杀商品
+
+	@Override
+	public ServerResponse saveOrUpdateMiaoshaProduct(MiaoshaProduct miaoshaProduct) {
+		//确保添加的秒杀商品，是存在于商品库中的
+		Product product = productMapper.selectByPrimaryKey(miaoshaProduct.getProductId());
+		if (miaoshaProduct.getMiaoshaStock() > product.getStock()){
+			return ServerResponse.createByErrorMessage("商品库存不足，最多添加"+product.getStock()+"件商品进行秒杀");
+		}
+		if (miaoshaProduct != null && product != null){
+			if (miaoshaProduct.getId() != null){
+				int rowCount = miaoshaProductMapper.updateByPrimaryKeySelective(miaoshaProduct);
+				if (rowCount > 0){
+					return ServerResponse.createBySuccessMessage("更新秒杀产品成功");
+				}else {
+					return ServerResponse.createByErrorMessage("更新秒杀产品失败");
+				}
+			}else {
+				int rowCount = miaoshaProductMapper.insertSelective(miaoshaProduct);
+				if (rowCount > 0){
+					return ServerResponse.createBySuccessMessage("新增秒杀产品成功");
+				}else {
+					return ServerResponse.createByErrorMessage("新增秒杀产品失败");
+				}
+			}
+
+		}else{
+			return ServerResponse.createByErrorMessage("新增或者更新产品参数不正确");
+		}
+	}
+
+	@Override
+	public ServerResponse listMiaoshaProduct() {
+		MiaoshaProductListVo result = new MiaoshaProductListVo();
+
+		List<MiaoshaProductVo> miaoshaProductVos = Lists.newArrayList();
+		List<MiaoshaProduct> list = miaoshaProductMapper.selectAllProduct();
+		for (MiaoshaProduct productItem:list) {
+			miaoshaProductVos.add(assembleMiaoshaProductListVo(productItem));
+		}
+		result.setMiaoshaProductVoList(miaoshaProductVos);
+		return ServerResponse.createBySuccess(result);
+	}
+
+	private MiaoshaProductVo assembleMiaoshaProductListVo(MiaoshaProduct miaoshaProduct){
+		MiaoshaProductVo miaoshaProductVo = new MiaoshaProductVo();
+		Product product = productMapper.selectByPrimaryKey(miaoshaProduct.getProductId());
+
+		miaoshaProductVo.setId(miaoshaProduct.getId());
+		miaoshaProductVo.setProductId(miaoshaProduct.getProductId());
+		miaoshaProductVo.setMiaoshaPrice(miaoshaProduct.getMiaoshaPrice());
+		miaoshaProductVo.setProductPrice(product.getPrice());
+		miaoshaProductVo.setProductMainImage(product.getMainImage());
+		miaoshaProductVo.setMiaoshaStock(miaoshaProduct.getMiaoshaStock());
+		miaoshaProductVo.setName(product.getName());
+		miaoshaProductVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix","http://img.happymmall.com/"));
+
+		return miaoshaProductVo;
+	}
+
+	@Override
+	public ServerResponse getMiaoshaProductDetailById(Integer miaoshaProductId) {
+		MiaoshaProduct miaoshaProduct = miaoshaProductMapper.selectByPrimaryKey(miaoshaProductId);
+		if (miaoshaProduct != null){
+			MiaoshaProductDetailVo miaoshaProductDetailVo = assembleMiaoshaProductDetailVo(miaoshaProduct);
+			return ServerResponse.createBySuccess(miaoshaProductDetailVo);
+		}else
+			return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+	}
+
+	private MiaoshaProductDetailVo assembleMiaoshaProductDetailVo(MiaoshaProduct miaoshaProduct) {
+		MiaoshaProductDetailVo miaoshaProductDetailVo = new MiaoshaProductDetailVo();
+		Product product = productMapper.selectByPrimaryKey(miaoshaProduct.getProductId());
+
+
+		miaoshaProductDetailVo.setId(miaoshaProduct.getId());
+		miaoshaProductDetailVo.setSubtitle(product.getSubtitle());
+		miaoshaProductDetailVo.setProductPrice(product.getPrice());
+		miaoshaProductDetailVo.setMiaoshaPrice(miaoshaProduct.getMiaoshaPrice());
+		miaoshaProductDetailVo.setCategoryId(product.getCategoryId());
+		miaoshaProductDetailVo.setMainImage(product.getMainImage());
+		miaoshaProductDetailVo.setDetail(product.getDetail());
+		miaoshaProductDetailVo.setName(product.getName());
+		miaoshaProductDetailVo.setMiaoshaStock(miaoshaProduct.getMiaoshaStock());
+		miaoshaProductDetailVo.setSubImages(product.getSubImages());
+
+
+		//还没有秒杀结束
+		if (miaoshaProduct.getEndTime().getTime() >= System.currentTimeMillis()){//获得的为毫秒
+			Integer remainSeconds = (int) (miaoshaProduct.getStartTime().getTime() - System.currentTimeMillis())/1000;
+			if (remainSeconds > 0){
+				miaoshaProductDetailVo.setMiaoshaStatus(Const.MiaoshaProductStatusEnum.NO_START.getCode());
+				miaoshaProductDetailVo.setRemainSeconds(remainSeconds);
+			}else {
+				miaoshaProductDetailVo.setMiaoshaStatus(Const.MiaoshaProductStatusEnum.ON_SALE.getCode());
+				miaoshaProductDetailVo.setRemainSeconds(0);
+			}
+		}else {
+			miaoshaProductDetailVo.setMiaoshaStatus(Const.MiaoshaProductStatusEnum.END_SALE.getCode());
+			miaoshaProductDetailVo.setRemainSeconds(-1);
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+		miaoshaProductDetailVo.setEndTime(sdf.format(miaoshaProduct.getEndTime()));
+		miaoshaProductDetailVo.setStartTime(sdf.format( miaoshaProduct.getStartTime()));
+
+		miaoshaProductDetailVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix","http://img.happymmall.com/"));
+		Category category = categoryMapper.selectByPrimaryKey(product.getCategoryId());
+		if (category == null){
+			miaoshaProductDetailVo.setParentCategoryId(0);	//默认为根节点
+		}else {
+			miaoshaProductDetailVo.setParentCategoryId(category.getParentId());
+		}
+		miaoshaProductDetailVo.setCreateTime(miaoshaProduct.getCreateTime());
+		miaoshaProductDetailVo.setUpdateTime(miaoshaProduct.getUpdateTime());
+
+		return miaoshaProductDetailVo;
+	}
+
+
 }

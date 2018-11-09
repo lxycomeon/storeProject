@@ -59,6 +59,30 @@ public class Const {
 			return code;
 		}
 	}
+	public enum MiaoshaProductStatusEnum{
+		ON_SALE("秒杀正在进行",0),
+		NO_START("秒杀未开始",1),
+		END_SALE("秒杀已经结束",2);
+
+
+		private String value;
+		private int code;
+
+		MiaoshaProductStatusEnum(String value, int code) {
+			this.value = value;
+			this.code = code;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public int getCode() {
+			return code;
+		}
+	}
+
+
 
 	public enum OrderStatusEnum{
 		CANCELED(0,"已取消"),

@@ -48,4 +48,7 @@ public interface IOrderService {
 	//定时关闭订单,传入前多长时间未付款的订单进行关闭
 	void closeOrder(int hour);
 
+	//秒杀订单
+	ServerResponse createMiaoshaOrder(Integer id, Integer shippingId, Integer miaoshaProductId);
+
 }
