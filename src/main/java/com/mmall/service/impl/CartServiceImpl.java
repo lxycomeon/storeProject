@@ -9,7 +9,9 @@ import com.mmall.dao.ProductMapper;
 import com.mmall.pojo.Cart;
 import com.mmall.pojo.Product;
 import com.mmall.service.ICartService;
+import com.mmall.util.JsonUtil;
 import com.mmall.util.PropertiesUtil;
+import com.mmall.util.RedisPoolUtil;
 import com.mmall.vo.CartListVo;
 import com.mmall.vo.CartProductVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +91,7 @@ public class CartServiceImpl implements ICartService {
 		if (product == null || product.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()){
 			return ServerResponse.createByErrorMessage("此产品已经删除或者下架");
 		}
+		RedisPoolUtil.expire(Const.RedisCacheName.REDIS_CACHE_CART_PRODUCT_COUNT,0);
 		Cart cartItem = cartMapper.selectByUserIdAndProduct(productId,userId);	//查询此用户是否已经添加过此商品
 		if (cartItem == null) {
 			Cart cart = new Cart();
@@ -164,7 +167,15 @@ public class CartServiceImpl implements ICartService {
 //		for (Cart cartItem:cartList) {
 //			totalProductCount += cartItem.getQuantity();
 //		}
-		int totalProductCount = cartMapper.selectProductCountByUserId(userId);
+		int totalProductCount;
+		String jsonStr = RedisPoolUtil.get(Const.RedisCacheName.REDIS_CACHE_CART_PRODUCT_COUNT);
+		if (jsonStr != null){
+			totalProductCount = Integer.parseInt(jsonStr);
+		}else {
+			totalProductCount = cartMapper.selectProductCountByUserId(userId);
+			RedisPoolUtil.setEx(Const.RedisCacheName.REDIS_CACHE_CART_PRODUCT_COUNT,totalProductCount+"",180);
+		}
+
 		return ServerResponse.createBySuccess(totalProductCount);
 	}
 

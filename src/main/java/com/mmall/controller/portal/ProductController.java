@@ -1,7 +1,10 @@
 package com.mmall.controller.portal;
 
+import com.mmall.common.RedisShardedPool;
 import com.mmall.common.ServerResponse;
 import com.mmall.service.IProductService;
+import com.mmall.util.JsonUtil;
+import com.mmall.util.RedisPoolUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +27,7 @@ public class ProductController {
 									  @RequestParam(value = "orderBy",defaultValue = "price_asc") String orderBy,
 									  @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
 									  @RequestParam(value = "pageSize",defaultValue = "10") int pageSize){
+
 		ServerResponse response = iProductService.listProduct(categoryId,keyword,orderBy,pageNum,pageSize);
 		System.out.println(response);
 		return response;

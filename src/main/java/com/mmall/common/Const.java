@@ -13,6 +13,10 @@ import java.util.Set;
 public class Const {
 	public static final String CURRENT_USER = "currentUser";
 	public static final String FORGET_TOKEN_PREFIX = "forgetToken_";
+	public interface RedisCacheName{
+		String REDIS_CACHE_MIAOSHA_PRODUCT_LIST = "REDIS_CACHE_MIAOSHA_PRODUCT_LIST";
+		String REDIS_CACHE_CART_PRODUCT_COUNT = "REDIS_CACHE_CART_PRODUCT_COUNT";
+	}
 
 	public interface RedisCacheExtime{
 		int REDIS_SESSION_EXTIME = 60 * 60 * 24*7;//登陆信息7 天有效

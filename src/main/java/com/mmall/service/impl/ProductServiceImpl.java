@@ -14,9 +14,12 @@ import com.mmall.pojo.MiaoshaProduct;
 import com.mmall.pojo.Product;
 import com.mmall.service.IProductService;
 import com.mmall.util.DateTimeUtil;
+import com.mmall.util.JsonUtil;
 import com.mmall.util.PropertiesUtil;
+import com.mmall.util.RedisPoolUtil;
 import com.mmall.vo.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -263,12 +266,18 @@ public class ProductServiceImpl implements IProductService {
 	@Override
 	public ServerResponse listMiaoshaProduct() {
 		MiaoshaProductListVo result = new MiaoshaProductListVo();
-
 		List<MiaoshaProductVo> miaoshaProductVos = Lists.newArrayList();
-		List<MiaoshaProduct> list = miaoshaProductMapper.selectAllProduct();
-		for (MiaoshaProduct productItem:list) {
-			miaoshaProductVos.add(assembleMiaoshaProductListVo(productItem));
+		String jsonStr = RedisPoolUtil.get(Const.RedisCacheName.REDIS_CACHE_MIAOSHA_PRODUCT_LIST);
+		if ( jsonStr != null){
+			miaoshaProductVos = JsonUtil.string2Obj(jsonStr,List.class,MiaoshaProductVo.class);
+		}else {
+			List<MiaoshaProduct> list = miaoshaProductMapper.selectAllProduct();
+			for (MiaoshaProduct productItem:list) {
+				miaoshaProductVos.add(assembleMiaoshaProductListVo(productItem));
+			}
+			RedisPoolUtil.setEx(Const.RedisCacheName.REDIS_CACHE_MIAOSHA_PRODUCT_LIST,JsonUtil.obj2String(miaoshaProductVos),120);
 		}
+
 		result.setMiaoshaProductVoList(miaoshaProductVos);
 		return ServerResponse.createBySuccess(result);
 	}

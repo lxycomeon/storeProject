@@ -60,11 +60,16 @@ public class UserController {
 		return response;
 	}
 
-	@RequestMapping(value = "check_valid.do")
+	@RequestMapping(value = "check_valid.do" )
 	@ResponseBody
-	public ServerResponse<Integer> checkUsernameValid(String str,Integer type){
-
-		ServerResponse<Integer> response = iUserService.checkUsernameValid(str,type);
+	public ServerResponse<Integer> checkUsernameValid(String str,String type){
+		ServerResponse<Integer> response = null;
+		if (type.equals("username")){
+			 response = iUserService.checkUsernameValid(str,0);
+		}
+		if (type.equals("email")){
+			response = iUserService.checkUsernameValid(str,1);
+		}
 		System.out.println(response);
 		return response;
 	}
@@ -187,6 +192,7 @@ public class UserController {
 	@RequestMapping("get_information.do")
 	@ResponseBody
 	public ServerResponse<User> getInformation(HttpServletRequest httpServletRequest ){
+
 		ServerResponse<User> response = null;
 		String loginToken = CookieUtil.readLoginToken(httpServletRequest);
 		if(StringUtils.isBlank(loginToken)){

@@ -70,6 +70,9 @@ public class OrderServiceImpl implements IOrderService {
 	ProductMapper productMapper;
 
 	@Autowired
+	MiaoshaOrderMapper miaoshaOrderMapper;
+
+	@Autowired
 	IUserService iUserService;
 
 	@Autowired
@@ -533,7 +536,8 @@ public class OrderServiceImpl implements IOrderService {
 		if (shipping == null || shipping.getUserId() != userId){
 			return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
 		}
-		int rowCount;
+
+		int rowCount = -1;
 		Order order = new Order();
 		Long orderNum = generateOrderNo();
 
@@ -541,6 +545,19 @@ public class OrderServiceImpl implements IOrderService {
 		//后台再加一个秒杀时间控制
 		if (miaoshaProduct.getStartTime().getTime() > System.currentTimeMillis() || miaoshaProduct.getEndTime().getTime() < System.currentTimeMillis()){
 			return ServerResponse.createByErrorMessage("秒杀时间有误，请稍后再试");
+		}
+		//MiaoshaOrder表中 userid和ProductId中存在唯一索引，实现一个用户只能秒杀一个秒杀商品
+		MiaoshaOrder miaoshaOrder = new MiaoshaOrder();
+		miaoshaOrder.setUserId(userId);
+		miaoshaOrder.setOrderId(orderNum);
+		miaoshaOrder.setMiaoshaProductId(miaoshaProductId);
+		try {
+			rowCount = miaoshaOrderMapper.insertSelective(miaoshaOrder);
+		}catch (Exception e){
+			log.info("userId:{}重复秒杀ProductId:{}商品",userId,miaoshaProductId);
+			if (rowCount <= 0){
+				return ServerResponse.createByErrorMessage("您已经秒杀过此商品了，请勿重复下单");
+			}
 		}
 
 		OrderItem orderItem = new OrderItem();

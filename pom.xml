@@ -239,6 +239,13 @@
       <version>2.9.0</version>
     </dependency>
 
+    <!--rabbitMQ消息中间件依赖-->
+    <dependency>
+      <groupId>org.springframework.amqp</groupId>
+      <artifactId>spring-rabbit</artifactId>
+      <version>1.6.8.RELEASE</version>
+    </dependency>
+
   </dependencies>
 
   <build>

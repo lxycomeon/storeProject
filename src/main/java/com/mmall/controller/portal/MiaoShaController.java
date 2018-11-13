@@ -2,7 +2,6 @@ package com.mmall.controller.portal;
 
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
-import com.mmall.dao.MiaoshaProductMapper;
 import com.mmall.pojo.User;
 import com.mmall.service.IOrderService;
 import com.mmall.service.IProductService;
@@ -10,10 +9,12 @@ import com.mmall.util.CookieUtil;
 import com.mmall.util.JsonUtil;
 import com.mmall.util.RedisPoolUtil;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.codehaus.jackson.type.TypeReference;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 @RequestMapping("/miaosha/")
-public class MiaoShaController {
+public class MiaoShaController implements InitializingBean {
 
 
 	@Autowired
@@ -31,6 +32,12 @@ public class MiaoShaController {
 
 	@Autowired
 	IOrderService iOrderService;
+
+	//系统初始化的时候，将秒杀商品的库存存入里面
+	@Override
+	public void afterPropertiesSet() throws Exception {
+
+	}
 
 	//列出秒杀商品
 	@RequestMapping("list.do")
@@ -49,6 +56,7 @@ public class MiaoShaController {
 		}else {
 			response = iProductService.listMiaoshaProduct();
 		}
+
 		System.out.println(response);
 		return response;
 	}
