@@ -60,6 +60,23 @@ public class RedisPoolUtil {
 		return result;
 	}
 
+	//减去1
+	public static Long decr(String key){
+		Jedis jedis = null;
+		Long result = null;
+
+		try {
+			jedis = RedisPool.getJedis();
+			result = jedis.decr(key);
+		}catch (Exception e){
+			log.error("decr key{} error",key,e);
+			RedisPool.returnBrokenResource(jedis);
+			return result;
+		}
+		RedisPool.returnResource(jedis);
+		return result;
+	}
+
 	//ex单位为s
 	public static String setEx(String key,String value,int exTime){
 		Jedis jedis = null;

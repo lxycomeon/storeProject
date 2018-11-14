@@ -3,6 +3,7 @@ package com.mmall.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mmall.common.Const;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -312,7 +314,6 @@ public class ProductServiceImpl implements IProductService {
 		MiaoshaProductDetailVo miaoshaProductDetailVo = new MiaoshaProductDetailVo();
 		Product product = productMapper.selectByPrimaryKey(miaoshaProduct.getProductId());
 
-
 		miaoshaProductDetailVo.setId(miaoshaProduct.getId());
 		miaoshaProductDetailVo.setSubtitle(product.getSubtitle());
 		miaoshaProductDetailVo.setProductPrice(product.getPrice());
@@ -323,7 +324,6 @@ public class ProductServiceImpl implements IProductService {
 		miaoshaProductDetailVo.setName(product.getName());
 		miaoshaProductDetailVo.setMiaoshaStock(miaoshaProduct.getMiaoshaStock());
 		miaoshaProductDetailVo.setSubImages(product.getSubImages());
-
 
 		//还没有秒杀结束
 		if (miaoshaProduct.getEndTime().getTime() >= System.currentTimeMillis()){//获得的为毫秒
@@ -356,5 +356,8 @@ public class ProductServiceImpl implements IProductService {
 		return miaoshaProductDetailVo;
 	}
 
-
+	@Override
+	public List<MiaoshaProduct> selectAllProduct() {
+		return miaoshaProductMapper.selectAllProduct();
+	}
 }

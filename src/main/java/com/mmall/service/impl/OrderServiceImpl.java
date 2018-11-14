@@ -22,10 +22,7 @@ import com.mmall.dao.*;
 import com.mmall.pojo.*;
 import com.mmall.service.IOrderService;
 import com.mmall.service.IUserService;
-import com.mmall.util.BigDecimalUtil;
-import com.mmall.util.DateTimeUtil;
-import com.mmall.util.FTPUtil;
-import com.mmall.util.PropertiesUtil;
+import com.mmall.util.*;
 import com.mmall.vo.OrderItemVo;
 import com.mmall.vo.OrderListVo;
 import com.mmall.vo.OrderProductVo;
@@ -34,10 +31,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.security.auth.login.Configuration;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -529,9 +528,11 @@ public class OrderServiceImpl implements IOrderService {
 		}
 	}
 
+
 	//秒杀订单的创建，商品数量只能为1
 	@Override
 	public ServerResponse createMiaoshaOrder(Integer userId, Integer shippingId, Integer miaoshaProductId) {
+
 		Shipping shipping = shippingMapper.selectByPrimaryKey(shippingId);	//dress
 		if (shipping == null || shipping.getUserId() != userId){
 			return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -553,10 +554,11 @@ public class OrderServiceImpl implements IOrderService {
 		miaoshaOrder.setMiaoshaProductId(miaoshaProductId);
 		try {
 			rowCount = miaoshaOrderMapper.insertSelective(miaoshaOrder);
+			RedisPoolUtil.set(Const.REDIS_MIAOSHA_ORDER_PREFIX+userId+miaoshaProductId,JsonUtil.obj2String(miaoshaOrder));
 		}catch (Exception e){
 			log.info("userId:{}重复秒杀ProductId:{}商品",userId,miaoshaProductId);
 			if (rowCount <= 0){
-				return ServerResponse.createByErrorMessage("您已经秒杀过此商品了，请勿重复下单");
+				return ServerResponse.createByResponseCodeAndData(ResponseCode.MIAOSHA_SUCCESS,miaoshaOrder);
 			}
 		}
 
@@ -564,6 +566,7 @@ public class OrderServiceImpl implements IOrderService {
 
 		Product productItem = productMapper.selectByPrimaryKey(miaoshaProduct.getProductId());
 		if (miaoshaProduct.getMiaoshaStock() < 1){
+			RedisPoolUtil.del(Const.REDIS_MIAOSHA_PRODUCT_STOCK_PREFIX+miaoshaProductId);
 			return ServerResponse.createByErrorMessage("产品"+productItem.getName()+"库存不足,秒杀失败,已结被抢完啦");
 		}
 		orderItem.setUserId(userId);
@@ -591,5 +594,28 @@ public class OrderServiceImpl implements IOrderService {
 		order.setStatus(Const.OrderStatusEnum.NO_PAY.getCode());
 		rowCount = orderMapper.insertSelective(order);
 		return ServerResponse.createBySuccess(assembleOrderListVoByOrder(order));
+	}
+
+	@Override
+	public MiaoshaOrder selectMiaoshaOrderByUserIdAndProductId(Integer userId, Integer miaoshaProductId) {
+
+		return miaoshaOrderMapper.selectMiaoshaOrderByUserIdAndProductId(userId, miaoshaProductId);
+	}
+
+
+	@Override
+	public ServerResponse queryMiaoshaResult(Integer userId, Integer miaoshaProductId) {
+
+		MiaoshaOrder miaoshaOrder = selectMiaoshaOrderByUserIdAndProductId(userId,miaoshaProductId);
+		if (miaoshaOrder != null){
+			Order order = orderMapper.selectByOrderNo(miaoshaOrder.getOrderId());
+			return ServerResponse.createByResponseCodeAndData(ResponseCode.MIAOSHA_SUCCESS,assembleOrderListVoByOrder(order));
+		}else {
+			String stock = RedisPoolUtil.get(Const.REDIS_MIAOSHA_PRODUCT_STOCK_PREFIX+miaoshaProductId);
+			if (stock == null || Integer.parseInt(stock) <= 0){
+				return ServerResponse.createByResponseCode(ResponseCode.MIAOSHA_FAIL);
+			}
+		}
+		return ServerResponse.createByResponseCode(ResponseCode.WAIT_MIAOSHA_RESULT);
 	}
 }

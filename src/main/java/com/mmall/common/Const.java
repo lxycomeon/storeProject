@@ -13,6 +13,9 @@ import java.util.Set;
 public class Const {
 	public static final String CURRENT_USER = "currentUser";
 	public static final String FORGET_TOKEN_PREFIX = "forgetToken_";
+	public static final String REDIS_MIAOSHA_PRODUCT_STOCK_PREFIX = "MIAOSHA_PRODUCT_STOCK_ID:";
+	public static final String REDIS_MIAOSHA_ORDER_PREFIX = "REDIS_MIAOSHA_ORDER_ID:";
+
 	public interface RedisCacheName{
 		String REDIS_CACHE_MIAOSHA_PRODUCT_LIST = "REDIS_CACHE_MIAOSHA_PRODUCT_LIST";
 		String REDIS_CACHE_CART_PRODUCT_COUNT = "REDIS_CACHE_CART_PRODUCT_COUNT";

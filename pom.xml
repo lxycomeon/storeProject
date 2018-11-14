@@ -243,7 +243,13 @@
     <dependency>
       <groupId>org.springframework.amqp</groupId>
       <artifactId>spring-rabbit</artifactId>
-      <version>1.6.8.RELEASE</version>
+      <version>1.4.5.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.rabbitmq</groupId>
+      <artifactId>amqp-client</artifactId>
+      <version>4.0.0</version>
     </dependency>
 
   </dependencies>

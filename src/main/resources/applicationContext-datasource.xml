@@ -11,6 +11,7 @@
 
     <!--<context:component-scan base-package="com.mmall" annotation-config="true"/>-->
 
+    <!--这个bean可以让配置文件中的属性直接显示出来-->
     <bean id="propertyConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="order" value="2"/>

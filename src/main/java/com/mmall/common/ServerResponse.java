@@ -1,5 +1,6 @@
 package com.mmall.common;
 
+import com.mmall.pojo.MiaoshaOrder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -36,6 +37,15 @@ public class ServerResponse<T> implements Serializable {
 		this.status = status;
 		this.msg	= msg;
 	}
+
+	public static <T> ServerResponse<T> createByResponseCode(ResponseCode responseCode) {
+		return new ServerResponse<T>(responseCode.getCode(),responseCode.getDesc());
+	}
+
+	public static <T> ServerResponse<T> createByResponseCodeAndData(ResponseCode responseCode, T data) {
+		return new ServerResponse<T>(responseCode.getCode(),responseCode.getDesc(),data);
+	}
+
 
 	@JsonIgnore			//此注解，可以在返回时，不把status序列化，忽略
 	public boolean isSuccess(){

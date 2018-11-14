@@ -1,8 +1,14 @@
 package com.mmall.controller.portal;
 
+import com.google.common.collect.Maps;
+import com.mmall.common.Const;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
+import com.mmall.pojo.MiaoshaOrder;
+import com.mmall.pojo.MiaoshaProduct;
 import com.mmall.pojo.User;
+import com.mmall.rabbitmq.MQSender;
+import com.mmall.rabbitmq.MiaoshaMessage;
 import com.mmall.service.IOrderService;
 import com.mmall.service.IProductService;
 import com.mmall.util.CookieUtil;
@@ -14,9 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.codehaus.jackson.type.TypeReference;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA By lxy on 2018/11/8
@@ -24,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 @RequestMapping("/miaosha/")
-public class MiaoShaController implements InitializingBean {
+public class MiaoShaController  implements InitializingBean{
 
 
 	@Autowired
@@ -33,10 +41,22 @@ public class MiaoShaController implements InitializingBean {
 	@Autowired
 	IOrderService iOrderService;
 
-	//系统初始化的时候，将秒杀商品的库存存入里面
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@Autowired
+	MQSender sender;
 
+
+	//缓存订单数量状态
+	HashMap<Integer,Boolean> productStockStatus = Maps.newHashMap();
+
+	@Override
+	public void afterPropertiesSet() {
+		List<MiaoshaProduct> list = iProductService.selectAllProduct();
+		for (MiaoshaProduct Item:list) {
+			RedisPoolUtil.set(Const.REDIS_MIAOSHA_PRODUCT_STOCK_PREFIX+Item.getId(),Item.getMiaoshaStock().toString());
+			if (Item.getMiaoshaStock()>0){
+				productStockStatus.put(Item.getId(),true);
+			}
+		}
 	}
 
 	//列出秒杀商品
@@ -95,11 +115,55 @@ public class MiaoShaController implements InitializingBean {
 		if (user == null){
 			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录");
 		}else {
-			response =iOrderService.createMiaoshaOrder(user.getId(),shippingId,miaoshaProductId );
+			////使用消息队列异步下单，减少阻塞时间
+			if (!productStockStatus.get(miaoshaProductId)){
+				return ServerResponse.createByErrorMessage("商品已经秒杀完毕");
+			}
+			//预减redis库存
+			Long productStock = RedisPoolUtil.decr(Const.REDIS_MIAOSHA_PRODUCT_STOCK_PREFIX+miaoshaProductId);
+			if (productStock < 0 ){
+				productStockStatus.put(miaoshaProductId,false);
+				return  ServerResponse.createByErrorMessage("商品已经秒杀完毕");
+			}
+			String OrderjsonStr = RedisPoolUtil.get(Const.REDIS_MIAOSHA_ORDER_PREFIX+user.getId()+miaoshaProductId);
+			MiaoshaOrder miaoshaOrder = JsonUtil.string2Obj(OrderjsonStr,MiaoshaOrder.class);
+			if (miaoshaOrder != null){
+				return  ServerResponse.createByResponseCodeAndData(ResponseCode.MIAOSHA_SUCCESS,miaoshaOrder);
+			}
+			//消息入队
+			sender.sendMiaoshaMessage(new MiaoshaMessage(user.getId(),miaoshaProductId,shippingId));
+
+			return  ServerResponse.createByResponseCode(ResponseCode.WAIT_MIAOSHA_RESULT);
+			//-------------------以上为使用消息队列进行秒杀下单，减少阻塞-----------------------------------;
+
+			//原生下单方式
+//			response =iOrderService.createMiaoshaOrder(user.getId(),shippingId,miaoshaProductId );
 		}
 		System.out.println(response);
 		return response;
 	}
+
+	@RequestMapping("queryResult.do")
+	@ResponseBody
+	public ServerResponse result(HttpServletRequest httpServletRequest,Integer miaoshaProductId){
+		ServerResponse response = null;
+		String loginToken = CookieUtil.readLoginToken(httpServletRequest);
+		if(StringUtils.isBlank(loginToken)){
+			return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+					"用户未登陆，无法获取当前用户信息");
+		}
+		String jsonStr = RedisPoolUtil.get(loginToken);
+		User user = JsonUtil.string2Obj(jsonStr,User.class);
+		if (user == null){
+			response = ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录");
+		}else {
+			response = iOrderService.queryMiaoshaResult(user.getId(),miaoshaProductId);
+		}
+		System.out.println(response);
+		return response;
+	}
+
+
 
 
 

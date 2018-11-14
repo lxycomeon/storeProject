@@ -11,7 +11,10 @@ public enum ResponseCode {
 	SUCCESS(0,"SUCCESS"),
 	ERROR(1,"ERROR"),
 	NEED_LOGIN(10,"NEED_LOGIN"),
-	ILLEGAL_ARGUMENT(2,"ILLEGAL_ARGUMENT");
+	ILLEGAL_ARGUMENT(2,"ILLEGAL_ARGUMENT"),
+	WAIT_MIAOSHA_RESULT(20,"排队中"),
+	MIAOSHA_FAIL(21,"秒杀失败，你来晚啦"),
+	MIAOSHA_SUCCESS(22,"秒杀成功，正在跳转");
 
 	private final int code;
 	private final String desc;

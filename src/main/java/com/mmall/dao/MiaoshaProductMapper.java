@@ -19,4 +19,5 @@ public interface MiaoshaProductMapper {
 
     List<MiaoshaProduct> selectAllProduct();
 
+
 }

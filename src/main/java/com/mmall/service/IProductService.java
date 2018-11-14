@@ -6,6 +6,9 @@ import com.mmall.pojo.MiaoshaProduct;
 import com.mmall.pojo.Product;
 import com.mmall.vo.ProductDetailVo;
 
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA By lxy on 2018/10/18
  */
@@ -31,5 +34,6 @@ public interface IProductService {
 
 	ServerResponse getMiaoshaProductDetailById(Integer miaoshaProductId);
 
+	List<MiaoshaProduct> selectAllProduct();
 
 }

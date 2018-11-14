@@ -1,6 +1,9 @@
 package com.mmall.controller;
 
 
+import com.mmall.rabbitmq.MQSender;
+import com.mmall.rabbitmq.MiaoshaMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -17,10 +20,13 @@ import java.math.BigDecimal;
 @RequestMapping("/test")
 public class test {
 
+	@Autowired
+	MQSender sender;
 
 
 	@RequestMapping(value = "test1.do")
 	public String test1(){
+		//sender.sendMiaoshaMessage(new MiaoshaMessage());
 
 		System.out.print("test");
 		return "text";

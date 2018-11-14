@@ -21,6 +21,7 @@
 
 
     <context:property-placeholder location="classpath:datasource.properties"/>
+    <context:property-placeholder location="classpath:mmall.properties"/>
     <task:annotation-driven/>
 
 
@@ -28,6 +29,7 @@
     <!--将配置文件分离，有一个datasource。xml-->
     <import resource="applicationContext-datasource.xml"/>
     <import resource="applicationContext-spring-session.xml"/>
+    <import resource="applicationContext-mq.xml"/>
 
 
 

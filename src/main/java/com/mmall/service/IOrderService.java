@@ -2,6 +2,7 @@ package com.mmall.service;
 
 import com.github.pagehelper.PageInfo;
 import com.mmall.common.ServerResponse;
+import com.mmall.pojo.MiaoshaOrder;
 import com.mmall.pojo.Order;
 import com.mmall.pojo.OrderItem;
 import com.mmall.vo.OrderItemVo;
@@ -50,5 +51,10 @@ public interface IOrderService {
 
 	//秒杀订单
 	ServerResponse createMiaoshaOrder(Integer id, Integer shippingId, Integer miaoshaProductId);
+
+	//查询秒杀订单
+	MiaoshaOrder selectMiaoshaOrderByUserIdAndProductId(Integer id, Integer miaoshaProductId);
+
+	ServerResponse queryMiaoshaResult(Integer id, Integer miaoshaProductId);
 
 }
