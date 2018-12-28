@@ -554,7 +554,7 @@ public class OrderServiceImpl implements IOrderService {
 		miaoshaOrder.setMiaoshaProductId(miaoshaProductId);
 		try {
 			rowCount = miaoshaOrderMapper.insertSelective(miaoshaOrder);
-			RedisPoolUtil.set(Const.REDIS_MIAOSHA_ORDER_PREFIX+userId+miaoshaProductId,JsonUtil.obj2String(miaoshaOrder));
+			RedisPoolUtil.set(Const.REDIS_MIAOSHA_ORDER_PREFIX+userId+"_"+miaoshaProductId,JsonUtil.obj2String(miaoshaOrder));
 		}catch (Exception e){
 			log.info("userId:{}重复秒杀ProductId:{}商品",userId,miaoshaProductId);
 			if (rowCount <= 0){

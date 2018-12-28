@@ -3,7 +3,6 @@ package com.mmall.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.mmall.common.Const;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
@@ -20,12 +19,10 @@ import com.mmall.util.PropertiesUtil;
 import com.mmall.util.RedisPoolUtil;
 import com.mmall.vo.*;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.List;
 
 /**

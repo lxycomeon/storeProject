@@ -125,7 +125,7 @@ public class MiaoShaController  implements InitializingBean{
 				productStockStatus.put(miaoshaProductId,false);
 				return  ServerResponse.createByErrorMessage("商品已经秒杀完毕");
 			}
-			String OrderjsonStr = RedisPoolUtil.get(Const.REDIS_MIAOSHA_ORDER_PREFIX+user.getId()+miaoshaProductId);
+			String OrderjsonStr = RedisPoolUtil.get(Const.REDIS_MIAOSHA_ORDER_PREFIX+user.getId()+"_"+miaoshaProductId);
 			MiaoshaOrder miaoshaOrder = JsonUtil.string2Obj(OrderjsonStr,MiaoshaOrder.class);
 			if (miaoshaOrder != null){
 				return  ServerResponse.createByResponseCodeAndData(ResponseCode.MIAOSHA_SUCCESS,miaoshaOrder);

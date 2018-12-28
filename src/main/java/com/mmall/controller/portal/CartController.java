@@ -152,8 +152,7 @@ public class CartController {
 		ServerResponse response = null;
 		String loginToken = CookieUtil.readLoginToken(httpServletRequest);
 		if(StringUtils.isBlank(loginToken)){
-			return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-					"用户未登陆，无法获取当前用户信息");
+			return ServerResponse.createByErrorMessage("用户未登陆，无法获取购物车数量");
 		}
 		String jsonStr = RedisPoolUtil.get(loginToken);
 		User user = JsonUtil.string2Obj(jsonStr,User.class);

@@ -1,6 +1,7 @@
 package com.mmall.vo;
 
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.util.Date;
 
 /**

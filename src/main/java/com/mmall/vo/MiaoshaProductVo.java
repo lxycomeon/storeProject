@@ -1,11 +1,15 @@
 package com.mmall.vo;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Queue;
+import java.util.Vector;
 
 /**
  * Created with IntelliJ IDEA By lxy on 2018/11/8
  */
 public class MiaoshaProductVo {
+
 	private Integer id;
 	private Integer productId;
 	private String name;

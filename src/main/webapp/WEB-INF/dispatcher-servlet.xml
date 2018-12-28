@@ -59,6 +59,10 @@
     </bean>
 
     <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.mmall.controller.common.interceptor.CrossDomainInterceptor" />
+        </mvc:interceptor>
         <!--定义在这个标签中的，所有的do请求都会被拦截-->
         <mvc:interceptor>
             <!--这里的path路径，如果输入manage/**表示拦截manage/product,manage/order,路径下的所有的*.do。
@@ -68,6 +72,8 @@
             <!--<mvc:exclude-mapping path="/manage/user/login.do"/>-->
             <bean class="com.mmall.controller.common.interceptor.AuthorityInterceptor" />
         </mvc:interceptor>
+
+
     </mvc:interceptors>
 
 

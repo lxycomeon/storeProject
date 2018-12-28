@@ -1,5 +1,6 @@
 package com.mmall.controller.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -9,6 +10,7 @@ import java.util.Date;
 /**
  * Created with IntelliJ IDEA By lxy on 2018/11/8
  */
+@Slf4j
 public class MyConverter implements Converter<String, Date> {
 
 	@Override
@@ -27,7 +29,7 @@ public class MyConverter implements Converter<String, Date> {
 				return simpleDateFormat.parse(source);
 			} catch (Exception e1) {
 
-				System.out.println("日期转换失败->" + this.getClass().getName());
+				log.info("日期转换失败->" + this.getClass().getName());
 			}
 		}
 		// 如果参数绑定失败返回null
