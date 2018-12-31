@@ -13,10 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import reactor.core.support.UUIDUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA
@@ -43,8 +45,10 @@ public class UserController {
 		if (response.isSuccess()){
 //			session.setAttribute(Const.CURRENT_USER,response.getData());
 //			session.setMaxInactiveInterval(3600);	//登陆有效期3600s
-			CookieUtil.writeLoginToken(httpServletResponse,session.getId());
-			RedisPoolUtil.setEx(session.getId(), JsonUtil.obj2String(response.getData()),Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+			//session.getId(),本来的token，为了测试将其改为UUID
+			String token = UUID.randomUUID().toString().replace("-","");
+			CookieUtil.writeLoginToken(httpServletResponse,token);
+			RedisPoolUtil.setEx(token, JsonUtil.obj2String(response.getData()),Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
 		}
 
 		System.out.println(response);
@@ -59,6 +63,16 @@ public class UserController {
 		System.out.println(response);
 		return response;
 	}
+
+	//只用一次
+//	@RequestMapping(value = "testCreateUser.do")
+//	@ResponseBody
+//	public ServerResponse<Integer> testCreateUser(){
+//		ServerResponse<Integer> response = iUserService.testCreateUser();
+//
+//		System.out.println(response);
+//		return response;
+//	}
 
 	@RequestMapping(value = "check_valid.do" )
 	@ResponseBody

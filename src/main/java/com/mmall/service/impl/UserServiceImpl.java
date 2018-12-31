@@ -186,4 +186,26 @@ public class UserServiceImpl implements IUserService {
 		}
 		return ServerResponse.createByError();
 	}
+
+	//仅供创建测试用户使用，只用一次
+	@Override
+	public ServerResponse<Integer> testCreateUser() {
+
+		//产生用户，加入数据库
+		for(int i = 0;i < 5000;i++){
+			User user = new User();
+			user.setId(10000+i);
+			user.setUsername("TestUser_"+i);
+			user.setPassword("123456");//所有密码都是123456
+			user.setEmail(10000+i+"@happymmall.com");
+			user.setRole(0);
+			user.setPhone("1308667"+i);
+			user.setQuestion("你的用户名？");
+			user.setAnswer("TestUser_"+i);
+			this.register(user);
+			System.out.println("--------creat_user:"+i);
+		}
+		System.out.println("--------creat_user finished--------");
+		return ServerResponse.createBySuccessMessage("create user finished");
+	}
 }

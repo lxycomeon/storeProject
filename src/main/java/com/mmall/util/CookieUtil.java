@@ -24,7 +24,7 @@ public class CookieUtil {
 		Cookie ck = new Cookie(COOKIE_NAME,token);
 		ck.setDomain(COOKIE_DOMAIN);
 		ck.setPath("/");
-		ck.setHttpOnly(true);	//防止脚本攻击，的访问允许。无法通过脚本发送给第三方
+		//ck.setHttpOnly(true);	//防止脚本攻击，的访问允许。无法通过脚本发送给第三方
 
 		//单位是秒
 		//如果这个setMaxAge不设置的话，cookie就不会写入硬盘，而是写在内存中，只是在当前页面有效。

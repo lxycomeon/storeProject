@@ -31,4 +31,7 @@ public interface IUserService {
 
 	ServerResponse checkAdminRole(User user);
 
+	//创建测试用户使用
+	ServerResponse<Integer> testCreateUser();
+
 }
