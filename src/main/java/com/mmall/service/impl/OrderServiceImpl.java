@@ -534,6 +534,7 @@ public class OrderServiceImpl implements IOrderService {
 	public ServerResponse createMiaoshaOrder(Integer userId, Integer shippingId, Integer miaoshaProductId) {
 
 		Shipping shipping = shippingMapper.selectByPrimaryKey(shippingId);	//dress
+		//测试用户秒杀抢订单使用的时候将 || shipping.getUserId() != userId 去掉
 		if (shipping == null || shipping.getUserId() != userId){
 			return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
 		}

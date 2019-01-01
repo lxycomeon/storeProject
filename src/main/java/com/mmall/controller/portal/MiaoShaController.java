@@ -45,7 +45,7 @@ public class MiaoShaController  implements InitializingBean{
 	MQSender sender;
 
 
-	//缓存订单数量状态
+	//缓存商品数量状态
 	HashMap<Integer,Boolean> productStockStatus = Maps.newHashMap();
 
 	@Override
@@ -55,6 +55,8 @@ public class MiaoShaController  implements InitializingBean{
 			RedisPoolUtil.set(Const.REDIS_MIAOSHA_PRODUCT_STOCK_PREFIX+Item.getId(),Item.getMiaoshaStock().toString());
 			if (Item.getMiaoshaStock()>0){
 				productStockStatus.put(Item.getId(),true);
+			}else{
+				productStockStatus.put(Item.getId(),false);
 			}
 		}
 	}
