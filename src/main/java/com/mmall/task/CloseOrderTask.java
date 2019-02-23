@@ -11,7 +11,6 @@ import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import sun.security.krb5.Config;
 
 import javax.annotation.PreDestroy;
 import java.util.concurrent.TimeUnit;

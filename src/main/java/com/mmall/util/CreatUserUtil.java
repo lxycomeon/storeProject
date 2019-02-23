@@ -9,6 +9,7 @@ import java.net.URL;
 
 /**
  * Created with IntelliJ IDEA By lxy on 2018/12/31
+ * 测试使用，目的是将用户登录记录token记录供给jmeter使用
  */
 public class CreatUserUtil {
 
@@ -23,7 +24,7 @@ public class CreatUserUtil {
 	}
 	public static void recToken() throws Exception{
 		String urlString = "http://192.168.50.111:80/user/login.do";
-		File file = new File("D:/tokens.txt");
+		File file = new File("D:/userCookie.txt");
 		if(file.exists()) {
 			file.delete();
 		}

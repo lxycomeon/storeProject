@@ -535,7 +535,7 @@ public class OrderServiceImpl implements IOrderService {
 
 		Shipping shipping = shippingMapper.selectByPrimaryKey(shippingId);	//dress
 		//测试用户秒杀抢订单使用的时候将 || shipping.getUserId() != userId 去掉
-		if (shipping == null || shipping.getUserId() != userId){
+		if (shipping == null){
 			return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
 		}
 

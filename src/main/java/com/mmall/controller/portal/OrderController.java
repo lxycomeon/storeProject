@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,7 +37,6 @@ public class OrderController {
 	IOrderService iOrderService;
 
 	Logger logger = LoggerFactory.getLogger(OrderController.class);
-
 
 
 	@RequestMapping("pay.do")

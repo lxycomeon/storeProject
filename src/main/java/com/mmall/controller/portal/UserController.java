@@ -37,11 +37,10 @@ public class UserController {
 
 	//对于/user/login.do的请求，只过滤POST请求
 	@RequestMapping(value = "login.do")//method = RequestMethod.POST
-	@ResponseBody					//返回时自动利用spring的jackon插件将返回结果自动转换为json
+	@ResponseBody					//返回时自动利用spring的jackon插件将返回结果自动转换为jsonServerResponse<User>
 	public ServerResponse<User> login(String username, String password, HttpSession session, HttpServletResponse httpServletResponse){
 
 		ServerResponse<User> response = iUserService.login(username,password);
-
 		if (response.isSuccess()){
 //			session.setAttribute(Const.CURRENT_USER,response.getData());
 //			session.setMaxInactiveInterval(3600);	//登陆有效期3600s
@@ -51,9 +50,29 @@ public class UserController {
 			RedisPoolUtil.setEx(token, JsonUtil.obj2String(response.getData()),Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
 		}
 
-		System.out.println(response);
+		//System.out.println(response);
 		return response;
 	}
+
+	//该版本用于，产生测试用户的token时候使用
+//	@RequestMapping(value = "login.do")//method = RequestMethod.POST
+//	@ResponseBody					//返回时自动利用spring的jackon插件将返回结果自动转换为jsonServerResponse<User>
+//	public String login(String username, String password, HttpSession session, HttpServletResponse httpServletResponse){
+//
+//		ServerResponse<User> response = iUserService.login(username,password);
+//		String token = null;
+//		if (response.isSuccess()){
+////			session.setAttribute(Const.CURRENT_USER,response.getData());
+////			session.setMaxInactiveInterval(3600);	//登陆有效期3600s
+//			//session.getId(),本来的token，为了测试将其改为UUID
+//			token = UUID.randomUUID().toString().replace("-","");
+//			CookieUtil.writeLoginToken(httpServletResponse,token);
+//			RedisPoolUtil.setEx(token, JsonUtil.obj2String(response.getData()),Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+//		}
+//
+//		//System.out.println(response);
+//		return token;
+//	}
 
 	@RequestMapping(value = "register.do")
 	@ResponseBody

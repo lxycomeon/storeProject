@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA By lxy on 2018/11/8
@@ -59,6 +58,9 @@ public class MiaoShaController  implements InitializingBean{
 				productStockStatus.put(Item.getId(),false);
 			}
 		}
+
+
+
 	}
 
 	//列出秒杀商品

@@ -25,7 +25,6 @@
     <task:annotation-driven/>
 
 
-
     <!--将配置文件分离，有一个datasource。xml-->
     <import resource="applicationContext-datasource.xml"/>
     <import resource="applicationContext-spring-session.xml"/>

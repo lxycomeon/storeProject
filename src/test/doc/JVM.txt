@@ -1,0 +1,2 @@
+-Xmx2048m -XX:NewSize=1024m -XX:MaxNewSize=1024m
+添加如上JVM参数
