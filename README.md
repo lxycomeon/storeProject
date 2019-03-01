@@ -1,6 +1,6 @@
 # 高并发商城平台系统
 - #### 项目架构
-![pic]()
+![pic](https://github.com/lxycomeon/storeProject/blob/V3.0/%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E/%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E5%9B%BE.png)
 - #### 数据库表的设计
 ![pic](https://github.com/lxycomeon/storeProject/blob/V3.0/%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E/%E8%A1%A8%E7%BB%93%E6%9E%84.jpg)
 - #### 主要使用技术
