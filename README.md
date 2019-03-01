@@ -2,7 +2,7 @@
 - #### 项目架构
 ![pic]()
 - #### 数据库表的设计
-![pic]()
+![pic](https://github.com/lxycomeon/storeProject/blob/V3.0/%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E/%E8%A1%A8%E7%BB%93%E6%9E%84.jpg)
 - #### 主要使用技术
 主要使用了Nginx负载均衡，Tomcat集群，分布式redis，rabbitMQ消息中间件，前后端分离，数据库使用的MySQL。
 - #### 主要功能模块
